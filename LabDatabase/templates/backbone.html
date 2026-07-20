@@ -1,0 +1,169 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'LabDatabase/css/backbone.css' %}">
+    <title>载体骨架信息 - 基因元件数据库</title>
+    
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>载体骨架信息</h1>
+            <div class="backbone-id">载体ID: {{backbone.id}}</div>
+            <div class = "backbone-id">最后更新时间：{{backbone.updatedate}}</div>
+        </header>
+        
+        <div class="content">
+            <div class="info-section">
+                <h2><i>📋</i> 基本信息</h2>
+                <h3><i class="fa-solid fa-user-secret"></i>  {{backbone.user}}</h3>
+                <div class="backbone-name">{{backbone.name}}({{backbone.alias}})</div>
+                
+                <!-- <p>pUC19是一种常用的克隆载体，大小为2686 bp，具有高拷贝数、多克隆位点和蓝白斑筛选等特性。</p> -->
+                
+                <div class="info-grid">
+                    <div class="info-card">
+                        <h3>载体大小</h3>
+                        <p>{{backbone.length}} bp</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>拷贝数</h3>
+                        <p>{{backbone.copynumber}}</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>宿主</h3>
+                        <p>{{backbone.species}}</p>
+                    </div>
+                    <div class = "info-card">
+                        <h3>备注</h3>
+                        <p>{{backbone.notes}}</p>
+                    </div>
+                </div>
+            </i>
+            
+            <div class="info-section">
+                <h2><i>🧬</i> 载体特征</h2>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h3><i>📍</i> 复制起点 (Ori)</h3>
+                        <div class="feature-details">
+                            <div class="feature-detail-item">
+                                <div class="detail-label">类型:</div>
+                                <div class="detail-value" id = "ori_detail_content">{{backbone.ori}}</div>
+                            </div>
+                            <!-- <div class="feature-detail-item">
+                                <div class="detail-label">位置:</div>
+                                <div class="detail-value">1551-2026 bp</div>
+                            </div>
+                            <div class="feature-detail-item">
+                                <div class="detail-label">特性:</div>
+                                <div class="detail-value">高拷贝数，松弛型复制</div>
+                            </div> -->
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <h3><i>🔖</i> 标记基因 (Marker)</h3>
+                        <!-- <p>pUC19载体使用氨苄青霉素抗性基因作为选择标记。</p> -->
+                        <div class="feature-details">
+                            <div class="feature-detail-item">
+                                <div class="detail-label">类型:</div>
+                                <div class="detail-value" id = "marker_detail_content" >{{backbone.marker}}</div>
+                            </div>
+                            <!-- <div class="feature-detail-item">
+                                <div class="detail-label">名称:</div>
+                                <div class="detail-value">Ampicillin resistance (AmpR)</div>
+                            </div>
+                            <div class="feature-detail-item">
+                                <div class="detail-label">位置:</div>
+                                <div class="detail-value">329-1276 bp</div>
+                            </div>
+                            <div class="feature-detail-item">
+                                <div class="detail-label">筛选浓度:</div>
+                                <div class="detail-value">100 μg/mL</div>
+                            </div> -->
+                        </div>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <h3><i>🧪</i> scar</h3>
+                        <div class="feature-details">
+                            <div class="feature-detail-item">
+                                <div class="detail-label">BsmBI:</div>
+                                <div class="detail-value">{{scar.bsmbi}}</div>
+                            </div>
+                            <div class="feature-detail-item">
+                                <div class="detail-label">BsaI:</div>
+                                <div class="detail-value">{{scar.bsai}}</div>
+                            </div>
+                            <div class="feature-detail-item">
+                                <div class="detail-label">BbsI:</div>
+                                <div class="detail-value">{{scar.bbsi}}</div>
+                            </div>
+                            <div class="feature-detail-item">
+                                <div class="detail-label">AarI:</div>
+                                <div class="detail-value">{{scar.aari}}</div>
+                            </div>
+                            <div class="feature-detail-item">
+                                <div class="detail-label">SapI:</div>
+                                <div class="detail-value">{{scar.sapi}}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="info-section">
+                <h2><i>🗺️</i> 载体图谱</h2>
+                <p>{{backbone.name}}载体图谱显示主要功能元件的位置和方向：</p>
+                <div class="map-container">
+                    <div class="plasmid-map" id = "plasmid-map-div">
+                        <!-- <div class="plasmid-label" style="transform: rotate(0deg) translate(220px) rotate(0deg);">{{backbone.marker}}</div>
+                        <div class="plasmid-label" style="transform: rotate(90deg) translate(220px) rotate(-90deg);">{{backbone.ori}}</div> -->
+                        <!-- <div class="plasmid-label" style="transform: rotate(180deg) translate(220px) rotate(-180deg);">LacZα (397-504)</div>
+                        <div class="plasmid-label" style="transform: rotate(270deg) translate(220px) rotate(-270deg);">MCS (396-454)</div> -->
+                        <!-- <div class="plasmid-label" style="transform: rotate(0deg) translate(220px) rotate(0deg);">AmpR (329-1276)</div>
+                        <div class="plasmid-label" style="transform: rotate(90deg) translate(220px) rotate(-90deg);">Ori (1551-2026)</div>
+                        <div class="plasmid-label" style="transform: rotate(180deg) translate(220px) rotate(-180deg);">LacZα (397-504)</div>
+                        <div class="plasmid-label" style="transform: rotate(270deg) translate(220px) rotate(-270deg);">MCS (396-454)</div> -->
+                    </div>
+                </div>
+                <div class="download-section">
+                    <button class="btn" id="downPartMapButton"><i>📥</i> 下载载体图谱</button>
+                    <button class="btn"><i>🧬</i> 下载序列文件</button>
+                    <button class="btn"><i>📋</i> 下载详细说明</button>
+                </div>
+            </div>
+            
+            <div class="info-section">
+                <h2><i>🧬</i> 载体序列</h2>
+                <p>以下是pUC19载体的完整DNA序列：</p>
+                <div class="sequence-container">
+                    <div class="sequence" id="SequenceContainer">
+                        {{backbone.sequence}}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="info-section">
+                <h2><i>📚</i> 参考文献</h2>
+                <ul class="reference-list">
+                    <li class="reference-item">
+                        <div class="reference-title">{{backbone.reference}}</div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <footer>
+            <p>基因元件数据库 &copy; 2023 | 最后更新: 2023年11月15日</p>
+        </footer>
+    </div>
+
+    <script src="{% static 'LabDatabase/js/backbone.js' %}"></script>
+</body>
+</html>

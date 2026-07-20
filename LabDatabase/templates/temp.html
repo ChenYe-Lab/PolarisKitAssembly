@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECharts树状图节点点击事件</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 25px;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #3498db, #9b59b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        @media (max-width: 1100px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .sidebar {
+            background-color: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            height: fit-content;
+        }
+        
+        .control-group {
+            margin-bottom: 30px;
+        }
+        
+        .control-group h3 {
+            color: #3498db;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .control-group h3 i {
+            font-size: 20px;
+        }
+        
+        .chart-container {
+            background-color: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            height: 700px;
+        }
+        
+        #treeChart {
+            width: 100%;
+            height: 650px;
+        }
+        
+        .event-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        button {
+            padding: 12px 15px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        #resetBtn {
+            background-color: #e74c3c;
+        }
+        
+        #resetBtn:hover {
+            background-color: #c0392b;
+        }
+        
+        #highlightPathBtn {
+            background-color: #2ecc71;
+        }
+        
+        #highlightPathBtn:hover {
+            background-color: #27ae60;
+        }
+        
+        .event-info {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .event-info h4 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .event-log {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 13px;
+            max-height: 150px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+        
+        .event-log .log-item {
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .event-log .log-item:last-child {
+            margin-bottom: 0;
+            border-bottom: none;
+        }
+        
+        .node-details {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border: 2px solid #3498db;
+        }
+        
+        .node-details h4 {
+            color: #3498db;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .detail-item:last-child {
+            margin-bottom: 0;
+            border-bottom: none;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: #7f8c8d;
+        }
+        
+        .detail-value {
+            font-weight: 500;
+            color: #2c3e50;
+            text-align: right;
+            max-width: 150px;
+            word-break: break-word;
+        }
+        
+        .event-types {
+            margin-top: 25px;
+        }
+        
+        .event-types h4 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .event-type-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .event-type-tag {
+            padding: 8px 12px;
+            background-color: #e8f4fc;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #3498db;
+            border: 1px solid #3498db;
+        }
+        
+        .instructions {
+            background-color: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 40px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        }
+        
+        .instructions h2 {
+            color: #2c3e50;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        
+        .code-example {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+        
+        .code-comment {
+            color: #95a5a6;
+        }
+        
+        .code-keyword {
+            color: #3498db;
+        }
+        
+        .code-string {
+            color: #2ecc71;
+        }
+        
+        .code-function {
+            color: #f39c12;
+        }
+        
+        .example-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 25px;
+        }
+        
+        .example-card {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .example-card h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .example-card p {
+            color: #7f8c8d;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        .selected-node {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(46, 204, 113, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(46, 204, 113, 0);
+            }
+        }
+        
+        .node-highlighted {
+            filter: drop-shadow(0 0 8px rgba(52, 152, 219, 0.8));
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .event-buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            header {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>ECharts树状图节点点击事件</h1>
+            <p class="subtitle">展示如何为ECharts树状图的每个节点设置点击事件，实现丰富的交互功能</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="sidebar">
+                <div class="control-group">
+                    <h3><i>🖱️</i> 事件控制</h3>
+                    <div class="event-buttons">
+                        <button id="clearLogBtn">
+                            <i>🗑️</i> 清空事件日志
+                        </button>
+                        <button id="resetBtn">
+                            <i>🔄</i> 重置选中状态
+                        </button>
+                        <button id="expandAllBtn">
+                            <i>📈</i> 展开全部节点
+                        </button>
+                        <button id="collapseAllBtn">
+                            <i>📉</i> 折叠全部节点
+                        </button>
+                    </div>
+                    
+                    <div class="event-info">
+                        <h4><i>📝</i> 事件日志</h4>
+                        <div class="event-log" id="eventLog">
+                            <div class="log-item">事件日志区域，点击节点查看事件信息</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <h3><i>📋</i> 节点详细信息</h3>
+                    <div class="node-details">
+                        <h4><i>🔍</i> 当前选中节点</h4>
+                        <div id="nodeDetails">
+                            <div class="detail-item">
+                                <span class="detail-label">节点名称:</span>
+                                <span class="detail-value">请点击树状图中的节点</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">节点值:</span>
+                                <span class="detail-value">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">节点深度:</span>
+                                <span class="detail-value">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">子节点数:</span>
+                                <span class="detail-value">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">节点类型:</span>
+                                <span class="detail-value">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <h3><i>⚡</i> 高级操作</h3>
+                    <div class="event-buttons">
+                        <button id="highlightPathBtn">
+                            <i>✨</i> 高亮路径到根节点
+                        </button>
+                        <button id="selectChildrenBtn">
+                            <i>👨‍👧‍👦</i> 选中所有子节点
+                        </button>
+                        <button id="addChildBtn">
+                            <i>➕</i> 添加子节点
+                        </button>
+                        <button id="removeNodeBtn">
+                            <i>➖</i> 删除节点
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="event-types">
+                    <h4><i>📊</i> 支持的事件类型</h4>
+                    <div class="event-type-list">
+                        <div class="event-type-tag">click</div>
+                        <div class="event-type-tag">dblclick</div>
+                        <div class="event-type-tag">mouseover</div>
+                        <div class="event-type-tag">mouseout</div>
+                        <div class="event-type-tag">contextmenu</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <div id="treeChart"></div>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h2>ECharts节点点击事件实现指南</h2>
+            
+            <div class="code-example">
+<span class="code-comment">// 1. 初始化ECharts实例</span>
+<span class="code-keyword">const</span> chart = echarts.init(<span class="code-string">document</span>.getElementById(<span class="code-string">'treeChart'</span>));
+
+<span class="code-comment">// 2. 设置图表配置项</span>
+<span class="code-keyword">const</span> option = {
+    <span class="code-string">series</span>: [{
+        <span class="code-string">type</span>: <span class="code-string">'tree'</span>,
+        <span class="code-string">data</span>: [treeData],
+        <span class="code-comment">// ... 其他配置</span>
+    }]
+};
+
+<span class="code-comment">// 3. 为图表设置点击事件监听</span>
+chart.on(<span class="code-string">'click'</span>, <span class="code-keyword">function</span> (params) {
+    <span class="code-comment">// params 包含点击的节点信息</span>
+    <span class="code-keyword">if</span> (params.componentType === <span class="code-string">'series'</span> && params.seriesType === <span class="code-string">'tree'</span>) {
+        <span class="code-keyword">const</span> nodeData = params.data;
+        <span class="code-string">console</span>.log(<span class="code-string">'点击的节点:'</span>, nodeData.name);
+        <span class="code-comment">// 执行自定义操作</span>
+    }
+});
+
+<span class="code-comment">// 4. 渲染图表</span>
+chart.setOption(option);
+            </div>
+            
+            <div class="example-grid">
+                <div class="example-card">
+                    <h3><i>🎯</i> 基本点击事件</h3>
+                    <p>通过 <code>chart.on('click', callback)</code> 监听节点点击事件，获取节点信息并在控制台输出。</p>
+                </div>
+                
+                <div class="example-card">
+                    <h3><i>🔍</i> 节点信息获取</h3>
+                    <p>事件参数 <code>params</code> 包含完整的节点信息：名称、值、深度、子节点列表等。</p>
+                </div>
+                
+                <div class="example-card">
+                    <h3><i>🎨</i> 视觉反馈</h3>
+                    <p>点击节点后可以动态修改节点样式，如改变颜色、添加动画、显示高亮效果等。</p>
+                </div>
+                
+                <div class="example-card">
+                    <h3><i>🔄</i> 动态操作</h3>
+                    <p>基于点击事件可以实现添加节点、删除节点、展开/折叠、高亮路径等动态操作。</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>ECharts树状图节点点击事件实现 | 支持多种交互操作和视觉反馈效果</p>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let chart;
+        let selectedNode = null;
+        let originalNodeStyle = new Map(); // 保存原始节点样式
+        let eventLog = [];
+        
+        // 示例树状图数据
+        const treeData = {
+            name: "中国",
+            value: 100,
+            depth: 0,
+            children: [
+                {
+                    name: "华东地区",
+                    value: 40,
+                    depth: 1,
+                    children: [
+                        {
+                            name: "浙江省",
+                            value: 20,
+                            depth: 2,
+                            children: [
+                                { name: "杭州市", value: 10, depth: 3 },
+                                { name: "宁波市", value: 6, depth: 3 },
+                                { name: "温州市", value: 4, depth: 3 }
+                            ]
+                        },
+                        {
+                            name: "江苏省",
+                            value: 15,
+                            depth: 2,
+                            children: [
+                                { name: "南京市", value: 8, depth: 3 },
+                                { name: "苏州市", value: 7, depth: 3 }
+                            ]
+                        },
+                        {
+                            name: "上海市",
+                            value: 5,
+                            depth: 2,
+                            children: [
+                                { name: "浦东新区", value: 3, depth: 3 },
+                                { name: "徐汇区", value: 2, depth: 3 }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    name: "华南地区",
+                    value: 35,
+                    depth: 1,
+                    children: [
+                        {
+                            name: "广东省",
+                            value: 20,
+                            depth: 2,
+                            children: [
+                                { name: "广州市", value: 10, depth: 3 },
+                                { name: "深圳市", value: 8, depth: 3 },
+                                { name: "东莞市", value: 2, depth: 3 }
+                            ]
+                        },
+                        {
+                            name: "广西省",
+                            value: 15,
+                            depth: 2,
+                            children: [
+                                { name: "南宁市", value: 8, depth: 3 },
+                                { name: "桂林市", value: 5, depth: 3 },
+                                { name: "柳州市", value: 2, depth: 3 }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    name: "华北地区",
+                    value: 25,
+                    depth: 1,
+                    children: [
+                        {
+                            name: "北京市",
+                            value: 15,
+                            depth: 2,
+                            children: [
+                                { name: "朝阳区", value: 6, depth: 3 },
+                                { name: "海淀区", value: 5, depth: 3 },
+                                { name: "东城区", value: 4, depth: 3 }
+                            ]
+                        },
+                        {
+                            name: "天津市",
+                            value: 10,
+                            depth: 2,
+                            children: [
+                                { name: "和平区", value: 4, depth: 3 },
+                                { name: "河西区", value: 3, depth: 3 },
+                                { name: "南开区", value: 3, depth: 3 }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        };
+        
+        // 初始化图表
+        function initChart() {
+            const chartDom = document.getElementById('treeChart');
+            chart = echarts.init(chartDom);
+            
+            // 设置图表配置
+            const option = getChartOption();
+            chart.setOption(option);
+            
+            // 设置事件监听
+            setupEventListeners();
+            
+            // 窗口大小变化时重绘
+            window.addEventListener('resize', function() {
+                chart.resize();
+            });
+        }
+        
+        // 获取图表配置
+        function getChartOption() {
+            return {
+                title: {
+                    text: '中国地区层级结构',
+                    left: 'center',
+                    textStyle: {
+                        color: '#2c3e50',
+                        fontSize: 22,
+                        fontWeight: 'bold'
+                    },
+                    subtext: '点击节点查看详细信息',
+                    subtextStyle: {
+                        color: '#7f8c8d',
+                        fontSize: 14
+                    }
+                },
+                tooltip: {
+                    trigger: 'item',
+                    triggerOn: 'mousemove',
+                    formatter: function(params) {
+                        const node = params.data;
+                        const childrenCount = node.children ? node.children.length : 0;
+                        return `
+                        <div style="padding: 10px; min-width: 180px;">
+                            <div style="font-weight: bold; margin-bottom: 5px; color: #3498db;">${node.name}</div>
+                            <div style="margin-bottom: 3px;">值: <span style="color: #2ecc71;">${node.value || 0}</span></div>
+                            <div style="margin-bottom: 3px;">深度: <span style="color: #f39c12;">${node.depth}</span></div>
+                            <div style="margin-bottom: 3px;">子节点数: <span style="color: #9b59b6;">${childrenCount}</span></div>
+                            <div style="margin-top: 8px; font-size: 12px; color: #95a5a6;">点击查看更多操作</div>
+                        </div>`;
+                    }
+                },
+                series: [{
+                    type: 'tree',
+                    data: [treeData],
+                    top: '60px',
+                    left: '20px',
+                    bottom: '20px',
+                    right: '20px',
+                    symbolSize: 15,
+                    label: {
+                        position: 'left',
+                        verticalAlign: 'middle',
+                        align: 'right',
+                        fontSize: 14,
+                        fontWeight: 'bold',
+                        color: '#2c3e50'
+                    },
+                    leaves: {
+                        label: {
+                            position: 'right',
+                            verticalAlign: 'middle',
+                            align: 'left'
+                        }
+                    },
+                    emphasis: {
+                        focus: 'descendant',
+                        itemStyle: {
+                            color: '#2ecc71'
+                        }
+                    },
+                    expandAndCollapse: true,
+                    initialTreeDepth: 2,
+                    lineStyle: {
+                        color: '#95a5a6',
+                        width: 2,
+                        curveness: 0.2
+                    },
+                    itemStyle: {
+                        color: function(params) {
+                            // 根据节点深度设置颜色
+                            const depth = params.data.depth;
+                            const colors = ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6'];
+                            return colors[depth % colors.length];
+                        },
+                        borderColor: '#fff',
+                        borderWidth: 2,
+                        shadowBlur: 5,
+                        shadowColor: 'rgba(0, 0, 0, 0.1)'
+                    },
+                    roam: true
+                }]
+            };
+        }
+        
+        // 设置事件监听
+        function setupEventListeners() {
+            // 1. 点击事件 - 最基本的节点点击
+            chart.on('click', function(params) {
+                if (params.componentType === 'series' && params.seriesType === 'tree') {
+                    handleNodeClick(params.data, params.event);
+                }
+            });
+            
+            // 2. 双击事件
+            chart.on('dblclick', function(params) {
+                if (params.componentType === 'series' && params.seriesType === 'tree') {
+                    handleNodeDoubleClick(params.data, params.event);
+                }
+            });
+            
+            // 3. 鼠标移入事件
+            chart.on('mouseover', function(params) {
+                if (params.componentType === 'series' && params.seriesType === 'tree') {
+                    handleNodeMouseOver(params.data, params.event);
+                }
+            });
+            
+            // 4. 鼠标移出事件
+            chart.on('mouseout', function(params) {
+                if (params.componentType === 'series' && params.seriesType === 'tree') {
+                    handleNodeMouseOut(params.data, params.event);
+                }
+            });
+            
+            // 5. 右键点击事件
+            chart.on('contextmenu', function(params) {
+                if (params.componentType === 'series' && params.seriesType === 'tree') {
+                    handleNodeRightClick(params.data, params.event);
+                    // 阻止默认右键菜单
+                    params.event.event.preventDefault();
+                    return false;
+                }
+            });
+        }
+        
+        // 处理节点点击事件
+        function handleNodeClick(nodeData, event) {
+            // 记录事件日志
+            addEventLog('click', `点击了节点: ${nodeData.name}`, nodeData);
+            
+            // 更新选中节点
+            selectNode(nodeData);
+            
+            // 更新节点详细信息显示
+            updateNodeDetails(nodeData);
+            
+            // 视觉反馈：高亮选中节点
+            highlightSelectedNode(nodeData);
+        }
+        
+        // 处理节点双击事件
+        function handleNodeDoubleClick(nodeData, event) {
+            addEventLog('dblclick', `双击了节点: ${nodeData.name}`, nodeData);
+            
+            // 切换节点的展开/折叠状态
+            toggleNodeExpandState(nodeData);
+        }
+        
+        // 处理鼠标移入事件
+        function handleNodeMouseOver(nodeData, event) {
+            addEventLog('mouseover', `鼠标移入节点: ${nodeData.name}`, nodeData);
+            
+            // 临时高亮节点
+            temporaryHighlightNode(nodeData, true);
+        }
+        
+        // 处理鼠标移出事件
+        function handleNodeMouseOut(nodeData, event) {
+            addEventLog('mouseout', `鼠标移出节点: ${nodeData.name}`, nodeData);
+            
+            // 取消临时高亮
+            temporaryHighlightNode(nodeData, false);
+        }
+        
+        // 处理右键点击事件
+        function handleNodeRightClick(nodeData, event) {
+            addEventLog('contextmenu', `右键点击了节点: ${nodeData.name}`, nodeData);
+            
+            // 显示自定义右键菜单（这里用alert代替）
+            alert(`右键菜单 - ${nodeData.name}\n\n可执行操作:\n1. 添加子节点\n2. 删除节点\n3. 重命名节点\n4. 复制节点`);
+            
+            // 也可以在此处显示一个自定义的右键菜单
+            // showCustomContextMenu(nodeData, event);
+        }
+        
+        // 选择节点
+        function selectNode(nodeData) {
+            selectedNode = nodeData;
+            
+            // 更新界面显示
+            document.querySelector('.node-details h4').innerHTML = `<i>🔍</i> 当前选中节点: ${nodeData.name}`;
+        }
+        
+        // 高亮选中节点
+        function highlightSelectedNode(nodeData) {
+            // 首先清除之前的高亮
+            clearNodeHighlights();
+            
+            // 保存当前选中节点的原始样式
+            saveOriginalNodeStyle(nodeData);
+            
+            // 应用高亮样式
+            applyHighlightStyle(nodeData);
+            
+            // 可选：高亮从根节点到当前节点的路径
+            highlightNodePath(nodeData);
+        }
+        
+        // 保存节点的原始样式
+        function saveOriginalNodeStyle(nodeData) {
+            // 在实际应用中，这里需要获取并保存节点的原始样式
+            // 这里简化为存储节点ID
+            if (!originalNodeStyle.has(nodeData.name)) {
+                originalNodeStyle.set(nodeData.name, {
+                    color: nodeData.itemStyle ? nodeData.itemStyle.color : null,
+                    borderColor: nodeData.itemStyle ? nodeData.itemStyle.borderColor : null
+                });
+            }
+        }
+        
+        // 应用高亮样式
+        function applyHighlightStyle(nodeData) {
+            // 更新图表数据中的节点样式
+            const option = chart.getOption();
+            const series = option.series[0];
+            
+            // 递归查找并更新节点样式
+            updateNodeStyleInData(series.data[0], nodeData.name, {
+                itemStyle: {
+                    color: '#e74c3c',
+                    borderColor: '#c0392b',
+                    borderWidth: 4,
+                    shadowBlur: 10,
+                    shadowColor: 'rgba(231, 76, 60, 0.8)'
+                }
+            });
+            
+            chart.setOption(option);
+        }
+        
+        // 递归更新节点样式
+        function updateNodeStyleInData(node, targetName, newStyle) {
+            if (node.name === targetName) {
+                node.itemStyle = newStyle.itemStyle;
+                return true;
+            }
+            
+            if (node.children) {
+                for (let child of node.children) {
+                    if (updateNodeStyleInData(child, targetName, newStyle)) {
+                        return true;
+                    }
+                }
+            }
+            
+            return false;
+        }
+        
+        // 高亮节点路径（从根节点到当前节点）
+        function highlightNodePath(nodeData) {
+            // 在实际应用中，这里需要找到从根节点到当前节点的路径
+            // 然后高亮路径上的所有节点
+            console.log('高亮路径到节点:', nodeData.name);
+            
+            // 这里可以添加具体的路径高亮逻辑
+            // 例如：找到所有祖先节点并高亮
+        }
+        
+        // 清除节点高亮
+        function clearNodeHighlights() {
+            // 恢复所有节点的原始样式
+            const option = chart.getOption();
+            const series = option.series[0];
+            
+            // 递归恢复节点样式
+            restoreOriginalStyles(series.data[0]);
+            
+            chart.setOption(option);
+        }
+        
+        // 递归恢复原始样式
+        function restoreOriginalStyles(node) {
+            if (originalNodeStyle.has(node.name)) {
+                const originalStyle = originalNodeStyle.get(node.name);
+                node.itemStyle = originalStyle;
+            }
+            
+            if (node.children) {
+                for (let child of node.children) {
+                    restoreOriginalStyles(child);
+                }
+            }
+        }
+        
+        // 临时高亮节点（鼠标悬停）
+        function temporaryHighlightNode(nodeData, isHighlight) {
+            const option = chart.getOption();
+            const series = option.series[0];
+            
+            updateNodeStyleInData(series.data[0], nodeData.name, {
+                itemStyle: {
+                    color: isHighlight ? '#f39c12' : null,
+                    borderColor: isHighlight ? '#d35400' : null,
+                    borderWidth: isHighlight ? 3 : 2
+                }
+            });
+            
+            chart.setOption(option);
+        }
+        
+        // 切换节点展开状态
+        function toggleNodeExpandState(nodeData) {
+            // 在实际的ECharts中，节点的展开状态是自动管理的
+            // 这里我们通过重新设置initialTreeDepth来模拟切换
+            const option = chart.getOption();
+            
+            // 查找当前节点的展开状态
+            // 注意：ECharts的tree系列会自动处理展开/折叠
+            
+            // 这里可以添加自定义的展开/折叠逻辑
+            addEventLog('expand/collapse', `切换了节点 ${nodeData.name} 的展开状态`, nodeData);
+        }
+        
+        // 更新节点详细信息显示
+        function updateNodeDetails(nodeData) {
+            const detailsContainer = document.getElementById('nodeDetails');
+            const childrenCount = nodeData.children ? nodeData.children.length : 0;
+            const nodeType = childrenCount > 0 ? '父节点' : '叶子节点';
+            
+            detailsContainer.innerHTML = `
+                <div class="detail-item">
+                    <span class="detail-label">节点名称:</span>
+                    <span class="detail-value">${nodeData.name}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">节点值:</span>
+                    <span class="detail-value">${nodeData.value || 0}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">节点深度:</span>
+                    <span class="detail-value">${nodeData.depth || 0}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">子节点数:</span>
+                    <span class="detail-value">${childrenCount}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">节点类型:</span>
+                    <span class="detail-value">${nodeType}</span>
+                </div>
+            `;
+        }
+        
+        // 添加事件日志
+        function addEventLog(eventType, message, nodeData) {
+            const timestamp = new Date().toLocaleTimeString();
+            const logItem = {
+                time: timestamp,
+                type: eventType,
+                message: message,
+                node: nodeData.name
+            };
+            
+            eventLog.unshift(logItem);
+            
+            // 保持日志最多10条
+            if (eventLog.length > 10) {
+                eventLog.pop();
+            }
+            
+            // 更新日志显示
+            updateEventLogDisplay();
+        }
+        
+        // 更新事件日志显示
+        function updateEventLogDisplay() {
+            const logContainer = document.getElementById('eventLog');
+            logContainer.innerHTML = '';
+            
+            eventLog.forEach(log => {
+                const logElement = document.createElement('div');
+                logElement.className = 'log-item';
+                logElement.innerHTML = `
+                    <span style="color: #95a5a6; font-size: 11px;">${log.time}</span>
+                    <span style="color: #3498db; font-weight: bold; margin: 0 5px;">[${log.type}]</span>
+                    ${log.message}
+                `;
+                logContainer.appendChild(logElement);
+            });
+        }
+        
+        // 清空事件日志
+        function clearEventLog() {
+            eventLog = [];
+            updateEventLogDisplay();
+        }
+        
+        // 展开所有节点
+        function expandAllNodes() {
+            const option = chart.getOption();
+            option.series[0].initialTreeDepth = 100; // 设置一个很大的深度值
+            chart.setOption(option);
+            addEventLog('control', '展开了所有节点', null);
+        }
+        
+        // 折叠所有节点
+        function collapseAllNodes() {
+            const option = chart.getOption();
+            option.series[0].initialTreeDepth = 0;
+            chart.setOption(option);
+            addEventLog('control', '折叠了所有节点', null);
+        }
+        
+        // 重置选中状态
+        function resetSelection() {
+            selectedNode = null;
+            clearNodeHighlights();
+            updateNodeDetails({});
+            document.querySelector('.node-details h4').innerHTML = `<i>🔍</i> 当前选中节点`;
+            addEventLog('control', '重置了选中状态', null);
+        }
+        
+        // 添加子节点
+        function addChildNode() {
+            if (!selectedNode) {
+                alert('请先选择一个节点');
+                return;
+            }
+            
+            const childName = prompt('请输入新子节点的名称:');
+            if (!childName) return;
+            
+            // 创建新节点
+            const newNode = {
+                name: childName,
+                value: Math.floor(Math.random() * 10) + 1,
+                depth: (selectedNode.depth || 0) + 1
+            };
+            
+            // 添加到选中节点的子节点列表
+            if (!selectedNode.children) {
+                selectedNode.children = [];
+            }
+            selectedNode.children.push(newNode);
+            
+            // 更新图表
+            chart.setOption({
+                series: [{
+                    data: [treeData]
+                }]
+            });
+            
+            addEventLog('control', `为节点 ${selectedNode.name} 添加了子节点 ${childName}`, selectedNode);
+        }
+        
+        // 删除节点
+        function removeNode() {
+            if (!selectedNode) {
+                alert('请先选择一个节点');
+                return;
+            }
+            
+            if (selectedNode.name === '中国') {
+                alert('不能删除根节点');
+                return;
+            }
+            
+            if (confirm(`确定要删除节点 "${selectedNode.name}" 吗？`)) {
+                // 在实际应用中，这里需要从树结构中删除节点
+                // 注意：这需要递归查找并删除节点
+                addEventLog('control', `删除了节点 ${selectedNode.name}`, selectedNode);
+                
+                // 重置选择
+                resetSelection();
+            }
+        }
+        
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化图表
+            initChart();
+            
+            // 绑定按钮事件
+            document.getElementById('clearLogBtn').addEventListener('click', clearEventLog);
+            document.getElementById('resetBtn').addEventListener('click', resetSelection);
+            document.getElementById('expandAllBtn').addEventListener('click', expandAllNodes);
+            document.getElementById('collapseAllBtn').addEventListener('click', collapseAllNodes);
+            document.getElementById('highlightPathBtn').addEventListener('click', function() {
+                if (selectedNode) {
+                    highlightNodePath(selectedNode);
+                    addEventLog('control', `高亮了到节点 ${selectedNode.name} 的路径`, selectedNode);
+                } else {
+                    alert('请先选择一个节点');
+                }
+            });
+            document.getElementById('selectChildrenBtn').addEventListener('click', function() {
+                if (selectedNode) {
+                    // 这里可以添加选中所有子节点的逻辑
+                    addEventLog('control', `选中了节点 ${selectedNode.name} 的所有子节点`, selectedNode);
+                } else {
+                    alert('请先选择一个节点');
+                }
+            });
+            document.getElementById('addChildBtn').addEventListener('click', addChildNode);
+            document.getElementById('removeNodeBtn').addEventListener('click', removeNode);
+            
+            // 初始日志
+            addEventLog('system', '图表初始化完成', null);
+        });
+    </script>
+</body>
+</html>

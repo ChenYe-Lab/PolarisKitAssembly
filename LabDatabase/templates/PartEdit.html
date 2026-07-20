@@ -1,0 +1,165 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <title>编辑基因元件信息 - 元件ID: 7309</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'LabDatabase/css/partEdit.css' %}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-left">
+                <h1><i class="fas fa-dna"></i> 编辑基因元件信息</h1>
+                <div class="subtitle">修改并更新基因元件详细信息</div>
+            </div>
+            <div class="element-id" id="gene-id">元件ID: {{part.partid}}</div>
+        </header>
+        
+        <div class="content">
+            <div class="section">
+                <div class="section-header">
+                    <h2><i class="fas fa-info-circle"></i> 基本信息</h2>
+                    <div class="status-badge status-pending">待更新</div>
+                </div>
+                <div class="section-content">
+                    <div class="form-group">
+                        <label for="name">元件名称（Name）:</label>
+                        <input type="text" id="name" class="form-control" value={{part.name}}>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="gene-aliad">元件别称（Alias）:</label>
+                        <input type="text" id="gene-alias" class="form-control" value={{part.alias}}>
+                    </div>
+                    
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header">
+                    <h2><i class="fas fa-tags"></i> 元件属性</h2>
+                </div>
+                <div class="section-content">
+                    <div class="form-group">
+                        <label for="element-type">元件类型:</label>
+                        <select id="element-type" class="form-control">
+                            {% if part.type == 1 %}
+                                <option value="Promoter" selected>Promoter (启动子)</option>
+                                <option value="Terminator">Terminator (终止子)</option>
+                                <option value="RBS">RBS (核糖体结合位点)</option>
+                                <option value="CDS">CDS (编码序列)</option>
+                                <option value="P+R">P+R (启动子+核糖体结合位点)</option>
+                            {% endif %}
+                            {% if part.type == 2 %}
+                                <option value="Promoter">Promoter (启动子)</option>
+                                <option value="Terminator">Terminator (终止子)</option>
+                                <option value="RBS">RBS (核糖体结合位点)</option>
+                                <option value="CDS" selected>CDS (编码序列)</option>
+                                <option value="P+R">P+R (启动子+核糖体结合位点)</option>
+                            {% endif %}
+                            {% if part.type == 3 %}
+                                <option value="Promoter">Promoter (启动子)</option>
+                                <option value="Terminator" selected>Terminator (终止子)</option>
+                                <option value="RBS">RBS (核糖体结合位点)</option>
+                                <option value="CDS">CDS (编码序列)</option>
+                                <option value="P+R">P+R (启动子+核糖体结合位点)</option>
+                            {% endif %}
+                            {% if part.type == 4 %}
+                                <option value="Promoter" selected>Promoter (启动子)</option>
+                                <option value="Terminator">Terminator (终止子)</option>
+                                <option value="RBS" selected>RBS (核糖体结合位点)</option>
+                                <option value="CDS">CDS (编码序列)</option>
+                                <option value="P+R">P+R (启动子+核糖体结合位点)</option>
+                            {% endif %}
+                            {% if part.type == 5 %}
+                                <option value="Promoter" selected>Promoter (启动子)</option>
+                                <option value="Terminator">Terminator (终止子)</option>
+                                <option value="RBS">RBS (核糖体结合位点)</option>
+                                <option value="CDS">CDS (编码序列)</option>
+                                <option value="P+R" selected>P+R (启动子+核糖体结合位点)</option>
+                            {% endif %}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="species-source">物种来源:</label>
+                        {% if part.sourceorganism %}
+                            <input type="text" id="species-source" class="form-control" value={{part.sourceorganism}}>
+                        {% else %}
+                            <input type="text" id="species-source" class="form-control" placeholder="例如: Escherichia coli, Homo sapiens" >
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header">
+                    <h2><i class="fas fa-sticky-note"></i> 备注</h2>
+                </div>
+                <div class="section-content">
+                    <div class="form-group">
+                        <label for="notes">备注信息:</label>
+                        {% if part.note %}
+                            <textarea id="notes" class="form-control" value={{part.note}}></textarea>
+                        {% else %}
+                            <textarea id="notes" class="form-control" placeholder="请输入关于此元件的备注信息..."></textarea>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header">
+                    <h2><i class="fas fa-code"></i> 元件序列</h2>
+                </div>
+                <div class="section-content">
+                    <div class="form-group">
+                        <label for="sequence">DNA序列:</label>
+                        <textarea id="sequence" class="form-control">{{part.level0sequence}}</textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>序列预览:</label>
+                        <div class="sequence-box">
+                            <span class = "StartScar"></span>
+                            <span class = "sequenceContent"></span>
+                            <span class = "EndScar"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header">
+                    <h2><i class="fas fa-book"></i> 参考文献</h2>
+                </div>
+                <div class="section-content">
+                    <div class="form-group">
+                        <label for="references">参考文献:</label>
+                        {% if part.reference %}
+                            <textarea id="references" class="form-control" value={{part.reference}}></textarea>
+                        {% else %}
+                            <textarea id="references" class="form-control" placeholder="请输入相关参考文献，每行一个引用..."></textarea>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="btn-group">
+                <button type="button" class="btn btn-secondary" id="cancel-btn">
+                    <i class="fas fa-times"></i> 取消编辑
+                </button>
+                <button type="button" class="btn btn-primary" id="save-btn">
+                    <i class="fas fa-save"></i> 保存更改
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'LabDatabase/js/partEdit.js' %}"></script>
+</body>
+</html>

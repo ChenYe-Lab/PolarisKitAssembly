@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <title>Design Builder</title>
+    <link href="/static/LabDatabase/bootstrap.min.css?v=20260509" rel="stylesheet" type="text/css">
+    <style>
+        :root {
+            --page-bg: #f5f6f8;
+            --panel-bg: #ffffff;
+            --sidebar-bg: #f0f2f4;
+            --line: #d9dde3;
+            --ink: #1f2937;
+            --muted: #6b7280;
+            --accent: #2563eb;
+            --accent-soft: #dbeafe;
+            --shadow: 0 14px 35px rgba(15, 23, 42, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: var(--page-bg);
+            color: var(--ink);
+            font-family: "Segoe UI", "PingFang SC", sans-serif;
+        }
+
+        .app-shell {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .topbar {
+            background: #fff;
+            border-bottom: 1px solid var(--line);
+            position: sticky;
+            top: 0;
+            z-index: 20;
+        }
+
+        .topbar-inner {
+            max-width: 100%;
+            height: 80px;
+            padding: 0 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand-title {
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .brand-subtitle {
+            color: var(--muted);
+            font-size: 0.95rem;
+        }
+
+        .topbar-nav {
+            display: flex;
+            align-items: center;
+            gap: 26px;
+        }
+
+        .topbar-nav a {
+            color: #818793;
+            text-decoration: none;
+            font-weight: 600;
+            padding-bottom: 4px;
+        }
+
+        .topbar-nav a.active {
+            color: var(--ink);
+            border-bottom: 2px solid var(--ink);
+        }
+
+        .avatar-chip {
+            width: 44px;
+            height: 44px;
+            border-radius: 999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #eef2f7;
+            border: 1px solid #d8dde6;
+            font-weight: 700;
+            color: #7b8491;
+        }
+
+        .workspace {
+            display: flex;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .sidebar {
+            width: 290px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--line);
+            padding: 24px 18px;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .sidebar h2,
+        .sidebar h3 {
+            margin: 0 0 12px;
+            font-weight: 800;
+        }
+
+        .sidebar h2 {
+            font-size: 1.1rem;
+        }
+
+        .sidebar h3 {
+            font-size: 1rem;
+            margin-top: 24px;
+        }
+
+        .nav-list,
+        .tool-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-list li + li,
+        .tool-list li + li {
+            margin-top: 8px;
+        }
+
+        .nav-link,
+        .tool-tab {
+            width: 100%;
+            border: none;
+            background: transparent;
+            text-align: left;
+            padding: 11px 14px;
+            border-radius: 12px;
+            color: #4b5563;
+            font-weight: 700;
+            text-decoration: none;
+            display: block;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .nav-link:hover,
+        .tool-tab:hover {
+            background: #e5e7eb;
+            color: #111827;
+        }
+
+        .tool-tab.active {
+            background: #d1d5db;
+            color: #111827;
+        }
+
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            background: #fff;
+        }
+
+        .content-pane {
+            padding: 34px 38px 48px;
+        }
+
+        .banner {
+            background: linear-gradient(135deg, #eef4ff 0%, #e6fff7 100%);
+            border: 1px solid #d5dfef;
+            border-radius: 22px;
+            padding: 18px 22px;
+            margin-bottom: 28px;
+            box-shadow: var(--shadow);
+        }
+
+        .banner h1,
+        .banner h2 {
+            margin: 0;
+            font-size: 1.45rem;
+            font-weight: 800;
+        }
+
+        .workspace-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
+            gap: 28px;
+        }
+
+        .card-panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--line);
+            border-radius: 22px;
+            box-shadow: var(--shadow);
+            padding: 24px;
+        }
+
+        .section-title {
+            margin: 0 0 16px;
+            font-size: 1.3rem;
+            font-weight: 800;
+        }
+
+        .divider-bar {
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 999px;
+            margin: 24px 0;
+        }
+
+        .chassis-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px 26px;
+        }
+
+        .choice-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .choice-pill input[type="radio"] {
+            width: 18px;
+            height: 18px;
+        }
+
+        .strength-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 16px 22px;
+        }
+
+        .field-block {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .field-block.wide {
+            grid-column: span 2;
+        }
+
+        .field-block label,
+        .field-caption {
+            font-size: 0.82rem;
+            font-weight: 800;
+            color: #4b5563;
+            text-transform: none;
+        }
+
+        .field-block input,
+        .field-block select,
+        .search-input-wrap input {
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            padding: 11px 13px;
+            background: #f9fafb;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .field-block input:focus,
+        .field-block select:focus,
+        .search-input-wrap input:focus {
+            border-color: #60a5fa;
+            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.18);
+            background: #fff;
+        }
+
+        .readonly-box {
+            min-height: 46px;
+            display: flex;
+            align-items: center;
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            padding: 11px 13px;
+            background: #f3f4f6;
+            font-weight: 700;
+        }
+
+        .search-row {
+            display: flex;
+            max-width: 620px;
+        }
+
+        .search-input-wrap {
+            position: relative;
+            flex: 1;
+        }
+
+        .search-input-wrap input {
+            width: 100%;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+            background: #fff;
+        }
+
+        .search-button {
+            min-width: 58px;
+            border: 1px solid #d1d5db;
+            border-left: none;
+            border-top-right-radius: 10px;
+            border-bottom-right-radius: 10px;
+            background: #e5e7eb;
+            font-size: 1.2rem;
+            transition: background-color 0.2s ease;
+        }
+
+        .search-button:hover {
+            background: #d1d5db;
+        }
+
+        .search-results {
+            margin-top: 10px;
+            max-width: 620px;
+            max-height: 240px;
+            overflow-y: auto;
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+            background: #fff;
+        }
+
+        .search-item {
+            padding: 13px 15px;
+            border-bottom: 1px solid #eef2f7;
+            cursor: pointer;
+        }
+
+        .search-item:last-child {
+            border-bottom: none;
+        }
+
+        .search-item:hover {
+            background: #eff6ff;
+        }
+
+        .formula-box,
+        .summary-card,
+        .metric-card,
+        .status-box,
+        .placeholder-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 18px;
+            background: #fff;
+        }
+
+        .formula-box {
+            padding: 16px 18px;
+            background: linear-gradient(180deg, #fff, #f8fffb);
+        }
+
+        .formula-title {
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: #374151;
+        }
+
+        .summary-list {
+            display: grid;
+            gap: 12px;
+        }
+
+        .summary-card {
+            padding: 14px 16px;
+        }
+
+        .summary-meta {
+            color: var(--muted);
+            font-size: 0.88rem;
+            margin-bottom: 6px;
+        }
+
+        .summary-kpi {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+            margin-top: 14px;
+        }
+
+        .metric-card {
+            padding: 14px 16px;
+        }
+
+        .metric-card .label {
+            color: var(--muted);
+            font-size: 0.88rem;
+            margin-bottom: 6px;
+        }
+
+        .metric-card strong {
+            font-size: 1.05rem;
+        }
+
+        .status-box {
+            margin-top: 14px;
+            padding: 14px 16px;
+            background: #f8fafc;
+            border-style: dashed;
+        }
+
+        .repository-visual {
+            margin-top: 28px;
+            padding: 24px;
+        }
+
+        .repository-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+
+        .repository-name-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            border-radius: 999px;
+            background: var(--accent-soft);
+            color: #1d4ed8;
+            font-weight: 800;
+        }
+
+        .repository-grid {
+            display: grid;
+            grid-template-columns: 1.25fr 0.75fr;
+            gap: 20px;
+        }
+
+        .repository-block {
+            border: 1px solid #e5e7eb;
+            border-radius: 18px;
+            padding: 18px;
+            background: linear-gradient(180deg, #fff, #fbfcfe);
+        }
+
+        .repository-block h4 {
+            margin: 0 0 12px;
+            font-size: 1rem;
+            font-weight: 800;
+        }
+
+        .repository-parts {
+            display: grid;
+            gap: 12px;
+        }
+
+        .part-chip {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 14px;
+            background: #fff;
+            border: 1px solid #e8edf3;
+        }
+
+        .part-chip strong {
+            display: block;
+        }
+
+        .part-chip small,
+        .muted-line {
+            color: var(--muted);
+            font-size: 0.88rem;
+        }
+
+        .backbone-card {
+            min-height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .backbone-name {
+            font-size: 1.15rem;
+            font-weight: 800;
+        }
+
+        .action-row,
+        .link-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        .primary-action,
+        .secondary-action {
+            min-width: 150px;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 800;
+            transition: transform 0.15s ease, background-color 0.2s ease;
+        }
+
+        .primary-action {
+            background: #3b82f6;
+            color: #fff;
+        }
+
+        .primary-action:hover {
+            background: #2563eb;
+        }
+
+        .secondary-action {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .secondary-action:hover {
+            background: #bfdbfe;
+        }
+
+        .primary-action:active,
+        .secondary-action:active {
+            transform: scale(0.98);
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        .placeholder-card {
+            min-height: 420px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 32px;
+            background: linear-gradient(180deg, #fff, #f8fafc);
+        }
+
+        .placeholder-icon {
+            width: 76px;
+            height: 76px;
+            border-radius: 999px;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin-bottom: 18px;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+        }
+
+        @media (max-width: 1080px) {
+            .workspace-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .strength-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .repository-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 860px) {
+            .workspace {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid var(--line);
+            }
+
+            .topbar-inner {
+                padding: 0 18px;
+                gap: 14px;
+                height: auto;
+                min-height: 80px;
+                flex-wrap: wrap;
+            }
+
+            .topbar-nav {
+                gap: 16px;
+                flex-wrap: wrap;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .content-pane {
+                padding: 22px 16px 28px;
+            }
+
+            .strength-grid,
+            .summary-kpi {
+                grid-template-columns: 1fr;
+            }
+
+            .field-block.wide {
+                grid-column: span 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-shell">
+        <header class="topbar">
+            <div class="topbar-inner">
+                <div>
+                    <h1 class="brand-title">SynBioHub Tools</h1>
+                    <div class="brand-subtitle">Device Generator</div>
+                </div>
+                <nav class="topbar-nav">
+                    <a href="/LabDatabase/index">Browse</a>
+                    <a href="#" class="active">Tools</a>
+                    <a href="/LabDatabase/index">Upload</a>
+                    <a href="/LabDatabase/index">Community</a>
+                    <a href="/LabDatabase/index">Help</a>
+                    <div class="avatar-chip">U</div>
+                </nav>
+            </div>
+        </header>
+
+        <div class="workspace">
+            <aside class="sidebar">
+                <h2>Filters &amp; Categories</h2>
+                <div>
+                    <h3>Part Design</h3>
+                    <ul class="nav-list">
+                        <li><a class="nav-link" href="/LabDatabase/index">T-Pro</a></li>
+                        <li><a class="nav-link" href="/LabDatabase/index">TF Plot</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Device Generator</h3>
+                    <ul class="tool-list">
+                        <li>
+                            <button type="button" class="tool-tab active" data-screen-target="expression-screen">
+                                Expression Box Design
+                            </button>
+                        </li>
+                        <li>
+                            <button type="button" class="tool-tab" data-screen-target="logic-screen">
+                                Logic Gate Design
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </aside>
+
+            <main class="main-content">
+                <section class="content-pane screen active" id="expression-screen">
+                    <div class="banner">
+                        <h2>Expression Box Design</h2>
+                    </div>
+
+                    <div class="workspace-grid">
+                        <div class="card-panel">
+                            <form id="designForm">
+                                <div>
+                                    <h3 class="section-title">Chassis</h3>
+                                    <div class="chassis-group">
+                                        {% for option in chassis_options %}
+                                        <label class="choice-pill">
+                                            <input
+                                                type="radio"
+                                                name="chassis"
+                                                id="chassis"
+                                                value="{{ option.value }}"
+                                                {% if forloop.first %}checked{% endif %}
+                                            >
+                                            <span>{{ option.label }}</span>
+                                        </label>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+
+                                <div class="divider-bar"></div>
+
+                                <div>
+                                    <h3 class="section-title">Strength</h3>
+                                    <div class="strength-grid">
+                                        <div class="field-block">
+                                            <input type="number" step="0.0001" min="0" id="promoter_strength" name="promoter_strength" placeholder="0.5">
+                                            <span class="field-caption">promoter</span>
+                                        </div>
+                                        <div class="field-block">
+                                            <input type="number" step="0.0001" min="0" id="rbs_strength" name="rbs_strength" placeholder="0.5">
+                                            <span class="field-caption">RBS</span>
+                                        </div>
+                                        <div class="field-block">
+                                            <div class="readonly-box" id="reference_strength">{{ reference_strength }}</div>
+                                            <span class="field-caption">Reference</span>
+                                        </div>
+                                        <div class="field-block">
+                                            <input type="number" step="0.0001" min="0" id="terminator_strength" name="terminator_strength" placeholder="0.5">
+                                            <span class="field-caption">Terminator</span>
+                                        </div>
+                                        <div class="field-block wide">
+                                            <input type="number" step="0.0001" min="0" id="expression_strength" name="expression_strength" placeholder="0.125">
+                                            <span class="field-caption">Expression strength target</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="divider-bar"></div>
+
+                                <div>
+                                    <h3 class="section-title">Protein</h3>
+                                    <div class="search-row">
+                                        <div class="search-input-wrap">
+                                            <input type="text" id="geneSearch" autocomplete="off" placeholder="Search proteins...">
+                                            <input type="hidden" id="gene_id" name="gene_id">
+                                        </div>
+                                        <button type="button" class="search-button" id="geneSearchButton" aria-label="Search">⌕</button>
+                                    </div>
+                                    <div class="search-results" id="geneResults"></div>
+                                </div>
+
+                                <div class="formula-box">
+                                    <div class="formula-title">Live Preview</div>
+                                    <div id="formulaPreview">Waiting for your inputs to calculate the design formula.</div>
+                                </div>
+
+                                <div class="action-row">
+                                    <button type="submit" class="primary-action">Design</button>
+                                    <button type="button" class="secondary-action" id="resetDesign">Reset</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="card-panel">
+                            <h3 class="section-title">Design Result</h3>
+                            <div id="summaryEmpty" class="text-muted">
+                                Submit the design form to see selected modules, predicted expression strength,
+                                repository name, and assembly task status.
+                            </div>
+                            <div id="summaryContent" style="display:none;">
+                                <div class="summary-list" id="selectedModules"></div>
+                                <div class="summary-kpi">
+                                    <div class="metric-card">
+                                        <div class="label">Target expression</div>
+                                        <strong id="predictedExpression">-</strong>
+                                    </div>
+                                    <div class="metric-card">
+                                        <div class="label">Design repository</div>
+                                        <strong id="repositoryName">-</strong>
+                                    </div>
+                                </div>
+                                <div class="status-box" id="taskStatusBox">Waiting for design submission.</div>
+                                <div class="link-row">
+                                    <a id="downloadLink" class="btn btn-primary btn-sm" href="#" target="_blank" style="display:none;">Download Assembly Result</a>
+                                    <a id="repoLink" class="btn btn-outline-primary btn-sm" href="#" target="_blank" style="display:none;">Open Repository</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-panel repository-visual" id="repositoryVisual" style="display:none;">
+                        <div class="repository-header">
+                            <div>
+                                <h3 class="section-title" style="margin-bottom:6px;">Design Repository Visualization</h3>
+                                <div class="text-muted">A direct view of the generated repository contents.</div>
+                            </div>
+                            <div class="repository-name-pill">
+                                <span>Repository</span>
+                                <span id="repositoryVisualName">-</span>
+                            </div>
+                        </div>
+
+                        <div class="repository-grid">
+                            <div class="repository-block">
+                                <h4>Parts Used</h4>
+                                <div class="repository-parts" id="repositoryPartsList"></div>
+                            </div>
+                            <div class="repository-block backbone-card">
+                                <h4>Backbone Used</h4>
+                                <div class="backbone-name" id="repositoryBackboneName">-</div>
+                                <div class="muted-line" id="repositoryBackboneAlias">Alias: -</div>
+                                <div class="muted-line" id="repositoryBackboneSpecies">Species: -</div>
+                                <div class="muted-line" id="repositoryBackboneStrength">Reference strength: -</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="content-pane screen" id="logic-screen">
+                    <div class="banner">
+                        <h2>Logic Gate Design</h2>
+                    </div>
+                    <div class="placeholder-card">
+                        <div class="placeholder-icon">⌕</div>
+                        <h3 class="section-title mb-2">Logic Gate Design is under development</h3>
+                        <p class="text-muted mb-0">
+                            This section is reserved for future logic gate design workflows and advanced device composition tools.
+                        </p>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    {{ promoter_strength_presets|json_script:"promoter-strength-presets" }}
+    {{ rbs_strength_presets|json_script:"rbs-strength-presets" }}
+    {{ terminator_strength_presets|json_script:"terminator-strength-presets" }}
+    <script src="/static/LabDatabase/js/design_builder.js?"></script>
+</body>
+</html>
