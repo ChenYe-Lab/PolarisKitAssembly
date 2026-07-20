@@ -1,0 +1,207 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Polaris Toolkit | Design Genetic Circuits</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;900&family=Inter:wght@300;400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <link href="{% static 'css/landing.css' %}" rel="stylesheet"/>
+</head>
+<body>
+    <header class="lp-header">
+        <nav class="lp-nav">
+            <a class="lp-brand" href="/">Polaris Toolkit</a>
+            <div class="lp-nav-links">
+                <a href="#workflow">Workflow</a>
+                <a href="#features">Features</a>
+                <a href="/kitserver/getTutorial">Tutorials</a>
+                <a href="#community">Community</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="lp-main">
+        <section class="lp-hero">
+            <div class="lp-hero-bg">
+                <div class="lp-hero-overlay"></div>
+                <img alt="abstract DNA circuit artwork" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDd1KAmMd3KsefJenHNrsEJo7TTt8fR4ViKdvFfcA-BDLA8wE9riTC0_tFzcycYEYd6GnrxzeXjgi8SgD3jJp2M0pG-3QNOI170EQBa7_5gBmKYRL_30-9k9nkp6rBbkH_KgewzNBCvZ7ib69aC2tEuE0hQGzAATVJ-FBd1oXQF513iQEi_LzisWKv6KydkgETOs8n63FwgQB4viRDu_E3AQO_TiTMlXWZTevT69u78KQYQ4ACxRJIDx-1Gen24c98uaHkyk7-0ZOo"/>
+            </div>
+            <div class="lp-hero-content">
+                <div class="lp-hero-copy">
+                    <h1>Design Life, <span>Component</span> by Component</h1>
+                    <p>
+                        The easiest way for beginners to start building genetic circuits with our intuitive drag-and-drop platform.
+                    </p>
+                    <div class="lp-actions">
+                        <a class="lp-btn lp-btn-primary" href="/kitserver/index">Start Designing Now</a>
+                        <a class="lp-btn lp-btn-secondary" href="#intro">Watch the Intro</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="lp-section lp-section-soft" id="intro">
+            <div class="lp-container lp-two-col">
+                <div>
+                    <div class="lp-kicker">The Fundamentals</div>
+                    <h2>What is Gene Circuit Design?</h2>
+                    <div class="lp-prose">
+                        <p>Just like an electronic circuit controls the flow of electricity, a <strong>genetic circuit</strong> controls the flow of biological information within a cell.</p>
+                        <p>By arranging biological components like promoters, repressors, and coding sequences, you can program living cells to sense environmental triggers, produce medicine, or change color in response to toxins.</p>
+                    </div>
+                </div>
+                <div class="lp-card lp-card-diagram">
+                    <div class="lp-diagram">
+                        <div class="lp-diagram-node lp-diagram-node-secondary">
+                            <span class="material-symbols-outlined">sensors</span>
+                            <span>Input: Toxin Detected</span>
+                        </div>
+                        <div class="lp-diagram-arrow material-symbols-outlined">arrow_downward</div>
+                        <div class="lp-diagram-core">LOGIC GATE (AND)</div>
+                        <div class="lp-diagram-arrow material-symbols-outlined">arrow_downward</div>
+                        <div class="lp-diagram-node lp-diagram-node-tertiary">
+                            <span class="material-symbols-outlined">biotech</span>
+                            <span>Output: Fluorescent Signal</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="lp-section" id="workflow">
+            <div class="lp-container">
+                <div class="lp-section-head">
+                    <h2>Beginner's Workflow</h2>
+                    <p>From concept to sequence in four intuitive steps.</p>
+                </div>
+                <div class="lp-grid lp-grid-steps">
+                    <article class="lp-step-card">
+                        <div class="lp-step-no">01</div>
+                        <div class="lp-icon-badge material-symbols-outlined">menu_book</div>
+                        <h3>Browse the Library</h3>
+                        <p>Choose from standardized biological parts ready for assembly.</p>
+                    </article>
+                    <article class="lp-step-card">
+                        <div class="lp-step-no">02</div>
+                        <div class="lp-icon-badge material-symbols-outlined">drag_click</div>
+                        <h3>Drag &amp; Drop</h3>
+                        <p>Assemble your circuit on a visual canvas with compatibility checks.</p>
+                    </article>
+                    <article class="lp-step-card">
+                        <div class="lp-step-no">03</div>
+                        <div class="lp-icon-badge material-symbols-outlined">analytics</div>
+                        <h3>Simulate</h3>
+                        <p>Run virtual experiments to preview behavior before lab work.</p>
+                    </article>
+                    <article class="lp-step-card">
+                        <div class="lp-step-no">04</div>
+                        <div class="lp-icon-badge material-symbols-outlined">file_download</div>
+                        <h3>Export</h3>
+                        <p>Download final DNA sequences for synthesis or further analysis.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="lp-section lp-section-surface" id="features">
+            <div class="lp-container">
+                <div class="lp-grid lp-grid-bento">
+                    <article class="lp-feature-card lp-feature-card-wide lp-feature-card-image">
+                        <img alt="biological registry artwork" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNvQsQUYN1Grnb3xIS03eEVYZKXndyOhaLfNliR4OnF4BhEehruUeq3Tdb4o_18WQlBU7YhCWLUvTqktU7kQReTpgpR3Phd8jrqphoqfFewSK6J8cN6GTL_nPUWgcxEqOMcqAOBhil8vZ88kF44-x0CYfCROWvB_MhQWEJgbKjsknNNuyVhvKm6Mt4Ne3HLCeiuo-nWXM0v9UzOgOaUDWVJo5joRwpMOleiz7EBe2yJVEKeBAkUh8D480jAXxP-pQVI5_wH1ZnEXw"/>
+                        <div class="lp-feature-copy">
+                            <span class="material-symbols-outlined lp-feature-icon">database</span>
+                            <h3>Bio-Part Registry</h3>
+                            <p>Access vetted genetic parts including promoters, CDS elements, backbones, and plasmids with verified metadata.</p>
+                        </div>
+                    </article>
+                    <article class="lp-feature-card lp-feature-card-primary">
+                        <span class="material-symbols-outlined lp-feature-icon">architecture</span>
+                        <div>
+                            <h3>Visual Builder</h3>
+                            <p>Build assembly plans with a guided interface designed for students and new lab members.</p>
+                        </div>
+                    </article>
+                    <article class="lp-feature-card lp-feature-card-secondary">
+                        <span class="material-symbols-outlined lp-feature-icon">science</span>
+                        <div>
+                            <h3>Pre-Lab Validation</h3>
+                            <p>Reduce failed builds by checking compatibility and assembly choices before execution.</p>
+                        </div>
+                    </article>
+                    <article class="lp-feature-card lp-feature-card-wide lp-feature-card-image">
+                        <img alt="simulation artwork" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDOolE3907Td9ZTISSzzpoSFDtgzMWl7ybyT1wKFRonvMW_1xEzoqOTMLnQL6xAtC93tHTc3kEK0uHO8DHAYnXK_wSkDc9LRZTfcadGNtpHHMIEDSdPDYofRKcX9FUAS-SWsNU5bdDwiF9x8BmAmDkxJbV9tSNxIYLMokFItTGcgb1XGQwjQHZ-iBgsHo4UaBxhsqR4_HMluAE7BE8tsUi4eIEA6JVdXhbECTX97jNiw78iHDG_9g6S2_Rt-ORgpDkUXWpPLe4uaiA"/>
+                        <div class="lp-feature-copy">
+                            <span class="material-symbols-outlined lp-feature-icon lp-feature-icon-secondary">query_stats</span>
+                            <h3>Intelligent Simulator</h3>
+                            <p>Preview performance and assembly outcomes with a workflow that feels approachable for first-time users.</p>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="lp-section" id="community">
+            <div class="lp-container lp-community">
+                <div class="lp-pill">
+                    <span class="material-symbols-outlined">groups</span>
+                    <span>Join the Network</span>
+                </div>
+                <h2>Join the Bio-Maker Community</h2>
+                <p>Connect with synthetic biologists, students, and enthusiasts. Share designs, debug circuits, and learn faster together.</p>
+                <div class="lp-grid lp-grid-links">
+                    <a class="lp-link-card" href="/kitserver/getTutorial">
+                        <div class="lp-link-card-left">
+                            <span class="material-symbols-outlined lp-link-icon">school</span>
+                            <div>
+                                <strong>Protocol Lab</strong>
+                                <span>Step-by-step learning modules</span>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined lp-link-arrow">chevron_right</span>
+                    </a>
+                    <a class="lp-link-card" href="/kitserver/index">
+                        <div class="lp-link-card-left">
+                            <span class="material-symbols-outlined lp-link-icon">forum</span>
+                            <div>
+                                <strong>Open the Builder</strong>
+                                <span>Jump directly into the circuit design workspace</span>
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined lp-link-arrow">chevron_right</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="lp-footer">
+        <div class="lp-container lp-footer-grid">
+            <div class="lp-footer-brand">
+                <div class="lp-footer-title">Polaris Toolkit</div>
+                <p>Empowering the next generation of bio-engineers with precision digital tools.</p>
+                <div class="lp-footer-meta">© 2024 Polaris Toolkit. Chenye Lab. SIAT.</div>
+            </div>
+            <div class="lp-footer-col">
+                <div class="lp-footer-col-title">Resources</div>
+                <a href="/kitserver/getTutorial">Documentation</a>
+                <a href="/kitserver/index">Builder</a>
+                <a href="/kitserver/getZip">Paper &amp; SI</a>
+            </div>
+            <div class="lp-footer-col">
+                <div class="lp-footer-col-title">Company</div>
+                <a href="#features">Security</a>
+                <a href="#community">Privacy</a>
+                <a href="#workflow">Terms</a>
+            </div>
+            <div class="lp-footer-col">
+                <div class="lp-footer-col-title">Social</div>
+                <a href="/kitserver/index">Platform</a>
+                <a href="/kitserver/getTutorial">Tutorials</a>
+                <a href="/kitserver/getZip">Github</a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

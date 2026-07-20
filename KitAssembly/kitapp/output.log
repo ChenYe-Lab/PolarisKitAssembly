@@ -1,0 +1,362 @@
+nohup: 忽略输入
+Watching for file changes with StatReloader
+[08/Feb/2026 10:52:06] "GET /kitserver/index HTTP/1.1" 200 37534
+[08/Feb/2026 10:52:07] "GET /kitserver/initdata?currentCategory=ecoli&currentType=part HTTP/1.1" 200 2623
+[08/Feb/2026 10:52:08] "GET /kitserver/initdata?currentCategory=ecoli&currentType=backbone HTTP/1.1" 200 3519
+[08/Feb/2026 10:52:09] "GET /kitserver/initdata?currentCategory=ecoli&currentType=plasmid HTTP/1.1" 200 1541
+[08/Feb/2026 10:52:10] "GET /kitserver/initdata?currentCategory=yeast&currentType=part HTTP/1.1" 200 6205
+[08/Feb/2026 10:52:11] "GET /kitserver/initdata?currentCategory=yeast&currentType=backbone HTTP/1.1" 200 6602
+[08/Feb/2026 10:52:11] "GET /kitserver/initdata?currentCategory=yeast&currentType=plasmid HTTP/1.1" 200 1885
+[11/Feb/2026 10:38:54] "GET /kitserver/index HTTP/1.1" 200 37534
+[11/Feb/2026 10:38:58] "GET /kitserver/initdata?currentCategory=ecoli&currentType=part HTTP/1.1" 200 2623
+[11/Feb/2026 10:39:03] "GET /kitserver/initdata?currentCategory=ecoli&currentType=backbone HTTP/1.1" 200 3519
+Not Found: /kitserver/
+[11/Feb/2026 12:11:28] "GET /kitserver/ HTTP/1.1" 404 3440
+Not Found: /favicon.ico
+[11/Feb/2026 12:11:28] "GET /favicon.ico HTTP/1.1" 404 2214
+/home/database/KitAssembly/kitapp/kitserver/views.py changed, reloading.
+Performing system checks...
+
+System check identified no issues (0 silenced).
+February 08, 2026 - 10:51:59
+Django version 5.2.11, using settings 'kitapp.settings'
+Starting development server at http://10.30.76.75:8000/
+Quit the server with CONTROL-C.
+
+WARNING: This is a development server. Do not use it in a production setting. Use a production WSGI or ASGI server instead.
+For more information on production servers see: https://docs.djangoproject.com/en/5.2/howto/deployment/
+Watching for file changes with StatReloader
+Exception in thread django-main-thread:
+Traceback (most recent call last):
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/threading.py", line 1009, in _bootstrap_inner
+    self.run()
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/threading.py", line 946, in run
+    self._target(*self._args, **self._kwargs)
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/django/utils/autoreload.py", line 64, in wrapper
+    fn(*args, **kwargs)
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/django/core/management/commands/runserver.py", line 134, in inner_run
+    self.check(**check_kwargs)
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/django/core/management/base.py", line 496, in check
+    all_issues = checks.run_checks(
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/django/core/checks/registry.py", line 89, in run_checks
+    new_errors = check(app_configs=app_configs, databases=databases)
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/django/core/checks/urls.py", line 16, in check_url_config
+    return check_resolver(resolver)
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/django/core/checks/urls.py", line 26, in check_resolver
+    return check_method()
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/django/urls/resolvers.py", line 531, in check
+    for pattern in self.url_patterns:
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/django/urls/resolvers.py", line 718, in url_patterns
+    patterns = getattr(self.urlconf_module, "urlpatterns", self.urlconf_module)
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/django/urls/resolvers.py", line 711, in urlconf_module
+    return import_module(self.urlconf_name)
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1050, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1027, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1006, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 688, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 883, in exec_module
+  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+  File "/home/database/KitAssembly/kitapp/kitapp/urls.py", line 23, in <module>
+    path('kitserver/',include('kitserver.urls')),
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/django/urls/conf.py", line 39, in include
+    urlconf_module = import_module(urlconf_module)
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1050, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1027, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1006, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 688, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 883, in exec_module
+  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+  File "/home/database/KitAssembly/kitapp/kitserver/urls.py", line 2, in <module>
+    from . import views
+  File "/home/database/KitAssembly/kitapp/kitserver/views.py", line 157
+    plasmid_data_response = session.get(f"{settings.WEBDATABASE_URL}PlasmidName?name={each["alias"]}",cookies = request.COOKIES)
+                                                                                            ^^^^^
+SyntaxError: f-string: unmatched '['
+/home/database/KitAssembly/kitapp/kitserver/views.py changed, reloading.
+Performing system checks...
+
+Watching for file changes with StatReloader
+[27/Feb/2026 03:59:24] "GET /kitserver/index HTTP/1.1" 200 37741
+Not Found: /favicon.ico
+[27/Feb/2026 03:59:24] "GET /favicon.ico HTTP/1.1" 404 2214
+Internal Server Error: /kitserver/initdata
+Traceback (most recent call last):
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/database/KitAssembly/kitapp/kitserver/views.py", line 93, in InitData
+    part_data_response = session.get(f'{settings.WEBDATABASE_URL}PartName?name={each["alias"]}',cookies=request.COOKIES)
+TypeError: string indices must be integers
+[27/Feb/2026 03:59:24] "GET /kitserver/initdata?currentCategory=ecoli&currentType=part HTTP/1.1" 500 66098
+[27/Feb/2026 04:00:26] "GET /kitserver/index HTTP/1.1" 200 37741
+Internal Server Error: /kitserver/initdata
+Traceback (most recent call last):
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/database/KitAssembly/kitapp/kitserver/views.py", line 93, in InitData
+    part_data_response = session.get(f'{settings.WEBDATABASE_URL}PartName?name={each["alias"]}',cookies=request.COOKIES)
+TypeError: string indices must be integers
+[27/Feb/2026 04:00:26] "GET /kitserver/initdata?currentCategory=ecoli&currentType=part HTTP/1.1" 500 66098
+[27/Feb/2026 04:00:47] "GET /kitserver/index HTTP/1.1" 200 37741
+Internal Server Error: /kitserver/initdata
+Traceback (most recent call last):
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/database/KitAssembly/kitapp/kitserver/views.py", line 93, in InitData
+    part_data_response = session.get(f'{settings.WEBDATABASE_URL}PartName?name={each["alias"]}',cookies=request.COOKIES)
+TypeError: string indices must be integers
+[27/Feb/2026 04:00:47] "GET /kitserver/initdata?currentCategory=ecoli&currentType=part HTTP/1.1" 500 66098
+/home/database/KitAssembly/kitapp/kitserver/views.py changed, reloading.
+Performing system checks...
+
+System check identified no issues (0 silenced).
+February 27, 2026 - 03:59:21
+Django version 5.2.11, using settings 'kitapp.settings'
+Starting development server at http://10.30.76.75:8000/
+Quit the server with CONTROL-C.
+
+WARNING: This is a development server. Do not use it in a production setting. Use a production WSGI or ASGI server instead.
+For more information on production servers see: https://docs.djangoproject.com/en/5.2/howto/deployment/
+Watching for file changes with StatReloader
+[27/Feb/2026 04:03:07] "GET /kitserver/index HTTP/1.1" 200 37741
+Internal Server Error: /kitserver/initdata
+Traceback (most recent call last):
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/database/KitAssembly/kitapp/kitserver/views.py", line 92, in InitData
+    for each in Ecoli_Part_promoter_List:
+NameError: name 'Ecoli_Part_promoter_List' is not defined
+[27/Feb/2026 04:03:07] "GET /kitserver/initdata?currentCategory=ecoli&currentType=part HTTP/1.1" 500 65890
+[27/Feb/2026 04:03:08] "GET /kitserver/index HTTP/1.1" 200 37741
+Internal Server Error: /kitserver/initdata
+Traceback (most recent call last):
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/database/KitAssembly/kitapp/kitserver/views.py", line 92, in InitData
+    for each in Ecoli_Part_promoter_List:
+NameError: name 'Ecoli_Part_promoter_List' is not defined
+[27/Feb/2026 04:03:08] "GET /kitserver/initdata?currentCategory=ecoli&currentType=part HTTP/1.1" 500 65890
+/home/database/KitAssembly/kitapp/kitserver/views.py changed, reloading.
+Performing system checks...
+
+System check identified no issues (0 silenced).
+February 27, 2026 - 04:02:06
+Django version 5.2.11, using settings 'kitapp.settings'
+Starting development server at http://10.30.76.75:8000/
+Quit the server with CONTROL-C.
+
+WARNING: This is a development server. Do not use it in a production setting. Use a production WSGI or ASGI server instead.
+For more information on production servers see: https://docs.djangoproject.com/en/5.2/howto/deployment/
+Watching for file changes with StatReloader
+[27/Feb/2026 04:03:46] "GET /kitserver/index HTTP/1.1" 200 37741
+Internal Server Error: /kitserver/initdata
+Traceback (most recent call last):
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/urllib3/connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/urllib3/util/connection.py", line 85, in create_connection
+    raise err
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+ConnectionRefusedError: [Errno 111] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 493, in _make_request
+    conn.request(
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/urllib3/connection.py", line 494, in request
+    self.endheaders()
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/http/client.py", line 1277, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/http/client.py", line 1037, in _send_output
+    self.send(msg)
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/http/client.py", line 975, in send
+    self.connect()
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/urllib3/connection.py", line 325, in connect
+    self.sock = self._new_conn()
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/urllib3/connection.py", line 213, in _new_conn
+    raise NewConnectionError(
+urllib3.exceptions.NewConnectionError: <urllib3.connection.HTTPConnection object at 0x7fda2086f8b0>: Failed to establish a new connection: [Errno 111] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+urllib3.exceptions.MaxRetryError: HTTPConnectionPool(host='10.30.76.2', port=8000): Max retries exceeded with url: /WebDatabase/PartName?name=XRHL1-P020 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fda2086f8b0>: Failed to establish a new connection: [Errno 111] Connection refused'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/database/KitAssembly/kitapp/kitserver/views.py", line 93, in InitData
+    part_data_response = session.get(f'{settings.WEBDATABASE_URL}PartName?name={each["alias"]}',cookies=request.COOKIES)
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/requests/sessions.py", line 602, in get
+    return self.request("GET", url, **kwargs)
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/requests/adapters.py", line 677, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPConnectionPool(host='10.30.76.2', port=8000): Max retries exceeded with url: /WebDatabase/PartName?name=XRHL1-P020 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fda2086f8b0>: Failed to establish a new connection: [Errno 111] Connection refused'))
+[27/Feb/2026 04:03:46] "GET /kitserver/initdata?currentCategory=ecoli&currentType=part HTTP/1.1" 500 171079
+[27/Feb/2026 04:03:47] "GET /kitserver/index HTTP/1.1" 200 37741
+Internal Server Error: /kitserver/initdata
+Traceback (most recent call last):
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/urllib3/connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/urllib3/util/connection.py", line 85, in create_connection
+    raise err
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/urllib3/util/connection.py", line 73, in create_connection
+    sock.connect(sa)
+ConnectionRefusedError: [Errno 111] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 493, in _make_request
+    conn.request(
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/urllib3/connection.py", line 494, in request
+    self.endheaders()
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/http/client.py", line 1277, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/http/client.py", line 1037, in _send_output
+    self.send(msg)
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/http/client.py", line 975, in send
+    self.connect()
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/urllib3/connection.py", line 325, in connect
+    self.sock = self._new_conn()
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/urllib3/connection.py", line 213, in _new_conn
+    raise NewConnectionError(
+urllib3.exceptions.NewConnectionError: <urllib3.connection.HTTPConnection object at 0x7fda20a00b20>: Failed to establish a new connection: [Errno 111] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/requests/adapters.py", line 644, in send
+    resp = conn.urlopen(
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/urllib3/connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/urllib3/util/retry.py", line 519, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+urllib3.exceptions.MaxRetryError: HTTPConnectionPool(host='10.30.76.2', port=8000): Max retries exceeded with url: /WebDatabase/PartName?name=XRHL1-P020 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fda20a00b20>: Failed to establish a new connection: [Errno 111] Connection refused'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/database/KitAssembly/kitapp/kitserver/views.py", line 93, in InitData
+    part_data_response = session.get(f'{settings.WEBDATABASE_URL}PartName?name={each["alias"]}',cookies=request.COOKIES)
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/requests/sessions.py", line 602, in get
+    return self.request("GET", url, **kwargs)
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/requests/adapters.py", line 677, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPConnectionPool(host='10.30.76.2', port=8000): Max retries exceeded with url: /WebDatabase/PartName?name=XRHL1-P020 (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fda20a00b20>: Failed to establish a new connection: [Errno 111] Connection refused'))
+[27/Feb/2026 04:03:47] "GET /kitserver/initdata?currentCategory=ecoli&currentType=part HTTP/1.1" 500 171079
+/home/database/KitAssembly/kitapp/kitapp/settings.py changed, reloading.
+Performing system checks...
+
+System check identified no issues (0 silenced).
+February 27, 2026 - 04:03:41
+Django version 5.2.11, using settings 'kitapp.settings'
+Starting development server at http://10.30.76.75:8000/
+Quit the server with CONTROL-C.
+
+WARNING: This is a development server. Do not use it in a production setting. Use a production WSGI or ASGI server instead.
+For more information on production servers see: https://docs.djangoproject.com/en/5.2/howto/deployment/
+Watching for file changes with StatReloader
+[27/Feb/2026 04:04:45] "GET /kitserver/index HTTP/1.1" 200 37741
+[27/Feb/2026 04:04:57] "GET /kitserver/initdata?currentCategory=ecoli&currentType=part HTTP/1.1" 200 2623
+[27/Feb/2026 04:05:04] "GET /kitserver/initdata?currentCategory=ecoli&currentType=backbone HTTP/1.1" 200 3519
+[27/Feb/2026 04:05:07] "GET /kitserver/initdata?currentCategory=ecoli&currentType=plasmid HTTP/1.1" 200 1688
+Internal Server Error: /kitserver/initdata
+Traceback (most recent call last):
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/database/KitAssembly/kitapp/kitserver/views.py", line 182, in InitData
+    part_length = f"{part_data_response.json()['data']['lengthinlevel0']}bp"
+KeyError: 'lengthinlevel0'
+[27/Feb/2026 04:05:07] "GET /kitserver/initdata?currentCategory=yeast&currentType=part HTTP/1.1" 500 66585
+/home/database/KitAssembly/kitapp/kitserver/views.py changed, reloading.
+Performing system checks...
+
+System check identified no issues (0 silenced).
+February 27, 2026 - 04:04:41
+Django version 5.2.11, using settings 'kitapp.settings'
+Starting development server at http://10.30.76.75:8000/
+Quit the server with CONTROL-C.
+
+WARNING: This is a development server. Do not use it in a production setting. Use a production WSGI or ASGI server instead.
+For more information on production servers see: https://docs.djangoproject.com/en/5.2/howto/deployment/
+Watching for file changes with StatReloader
+[27/Feb/2026 04:06:01] "GET /kitserver/index HTTP/1.1" 200 37741
+[27/Feb/2026 04:06:03] "GET /kitserver/initdata?currentCategory=ecoli&currentType=part HTTP/1.1" 200 2623
+[27/Feb/2026 04:06:05] "GET /kitserver/initdata?currentCategory=ecoli&currentType=backbone HTTP/1.1" 200 3519
+[27/Feb/2026 04:06:05] "GET /kitserver/initdata?currentCategory=ecoli&currentType=plasmid HTTP/1.1" 200 1688
+Internal Server Error: /kitserver/initdata
+Traceback (most recent call last):
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/database/anaconda3/envs/TFEnv/lib/python3.10/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/database/KitAssembly/kitapp/kitserver/views.py", line 208, in InitData
+    part_length = f"{part_data_response.json()['data']['length']}bp"
+KeyError: 'length'
+[27/Feb/2026 04:06:07] "GET /kitserver/initdata?currentCategory=yeast&currentType=part HTTP/1.1" 500 79242
+/home/database/KitAssembly/kitapp/kitserver/views.py changed, reloading.
+Performing system checks...
+
+System check identified no issues (0 silenced).
+February 27, 2026 - 04:05:58
+Django version 5.2.11, using settings 'kitapp.settings'
+Starting development server at http://10.30.76.75:8000/
+Quit the server with CONTROL-C.
+
+WARNING: This is a development server. Do not use it in a production setting. Use a production WSGI or ASGI server instead.
+For more information on production servers see: https://docs.djangoproject.com/en/5.2/howto/deployment/
+Watching for file changes with StatReloader
+[27/Feb/2026 04:06:32] "GET /kitserver/index HTTP/1.1" 200 37741
+[27/Feb/2026 04:06:33] "GET /kitserver/initdata?currentCategory=ecoli&currentType=part HTTP/1.1" 200 2623
+[27/Feb/2026 04:06:34] "GET /kitserver/initdata?currentCategory=ecoli&currentType=backbone HTTP/1.1" 200 3519
+[27/Feb/2026 04:06:35] "GET /kitserver/initdata?currentCategory=ecoli&currentType=plasmid HTTP/1.1" 200 1688
+[27/Feb/2026 04:06:36] "GET /kitserver/initdata?currentCategory=yeast&currentType=part HTTP/1.1" 200 7888
+[27/Feb/2026 04:06:36] "GET /kitserver/initdata?currentCategory=yeast&currentType=backbone HTTP/1.1" 200 6805
+[27/Feb/2026 04:06:37] "GET /kitserver/initdata?currentCategory=yeast&currentType=plasmid HTTP/1.1" 200 1094

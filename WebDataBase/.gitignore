@@ -1,0 +1,5 @@
+.env
+/WebDataWorld/logs/
+/WebDataWorld/output/
+/WebDataWorld/static/
+/WebDataWorld/LabDatabase/static/LabDatabase/DownloadFile/GenerateFile

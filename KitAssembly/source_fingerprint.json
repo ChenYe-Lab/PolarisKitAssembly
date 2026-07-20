@@ -1,0 +1,40 @@
+﻿{
+    "generated_at":  "2026-06-25T21:50:59.5038396+08:00",
+    "output_files":  {
+                         "source_fingerprint":  "C:\\Users\\admin\\Desktop\\KitAssembly\\source_fingerprint.json",
+                         "requirements":  "C:\\Users\\admin\\Desktop\\KitAssembly\\requirements.txt"
+                     },
+    "environment":  {
+                        "shell":  "powershell",
+                        "cwd":  "C:\\Users\\admin\\Desktop\\KitAssembly"
+                    },
+    "python":  {
+                   "command":  "python --version",
+                   "exit_code":  0,
+                   "output":  "Python 3.14.4"
+               },
+    "os_release":  {
+                       "command":  "cat /etc/os-release",
+                       "exit_code":  1,
+                       "output":  "Not available on this Windows/PowerShell environment."
+                   },
+    "django_requirements":  {
+                                "command":  "pip freeze \u003e requirements.txt",
+                                "exit_code":  0,
+                                "requirements_file":  "C:\\Users\\admin\\Desktop\\KitAssembly\\requirements.txt",
+                                "output":  ""
+                            },
+    "mysql":  {
+                  "note":  "MySQL commands were rerun with the provided root password. Password is redacted from recorded command strings.",
+                  "character_set_database":  {
+                                                 "command":  "mysql -u root -p****** -e SHOW_CHARACTER_SET_DATABASE",
+                                                 "exit_code":  0,
+                                                 "output":  "Variable_name\tValue\r\ncharacter_set_database\tutf8mb4"
+                                             },
+                  "database_sizes":  {
+                                         "command":  "mysql -u root -p****** -e SELECT_DATABASE_SIZES",
+                                         "exit_code":  0,
+                                         "output":  "TABLE_SCHEMA\tSize_MB\r\nexprdata\t0.22\r\ninformation_schema\t0.00\r\nlabdnadata\t81.27\r\nmysql\t2.92\r\npai_coding\t0.97\r\nperformance_schema\t0.00\r\nsys\t0.02"
+                                     }
+              }
+}

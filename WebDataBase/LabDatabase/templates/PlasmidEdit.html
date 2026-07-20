@@ -1,0 +1,208 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <title>编辑质粒信息 - 质粒ID: {{plasmid.plasmidid}}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="{% static 'LabDatabase/css/plasmidEdit.css' %}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-left">
+                <h1><i class="fas fa-dna"></i> 编辑质粒信息</h1>
+                <div class="subtitle">修改并更新质粒详细信息</div>
+            </div>
+            <div class="vector-id" id="id-div">质粒ID: {{plasmid.plasmidid}}</div>
+        </header>
+        
+        <div class="content">
+            <div class="section">
+                <div class="section-header">
+                    <h2><i class="fas fa-info-circle"></i> 基本信息</h2>
+                    <div class="status-badge status-pending">待更新</div>
+                </div>
+                <div class="section-content">
+                    <div class="form-group">
+                        <div class="sub-form-group">
+                            <label for="plasmid-name" style="width: 100px;">质粒名称:</label>
+                            <input type="text" id="plasmid-name" class="form-control" value="{{plasmid.name}}">
+                        </div>
+                        <div class="sub-form-group">
+                            <label for="plasmid-alias" style="width: 100px;">质粒别名:</label>
+                            <input type="text" id="plasmid-alias" class="form-control" value="{{plasmid.alias}}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header">
+                    <h2><i class="fas fa-cogs"></i>质粒特征</h2>
+                </div>
+                <div class="section-content">
+                    <div class="vector-features">
+                        <div class="feature-item">
+                            <h4><i class="fas fa-dot-circle"></i> 复制起点 (Ori)</h4>
+                            <div class="form-group" style="margin-bottom: 0;" id="ori-div">
+                                {% for ori_item in plasmid.ori %}
+                                    <div class="sub-form-group">
+                                        <input type="text" id="ori-type" class="form-control" value="{{ ori_item }}">
+                                        <button type="button" class="btn btn-secondary" id="removeOriginButton_{{ori_item}}" onclick="removesubform(this)"><i class="fa-solid fa-xmark"></i></button>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            <button type="button" class="btn btn-secondary" id="addOriginButton" onclick="addorigin()"><i class="fa-solid fa-plus"></i></button>
+                        </div>
+                        
+                        <div class="feature-item">
+                            <h4><i class="fas fa-copy"></i> 层级</h4>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <input type="text" id="level" class="form-control" placeholder="例如: 1,2,3" value="{{plasmid.level}}">
+                                <div class="form-hint">原始数据: {{plasmid.level}}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="feature-item">
+                            <h4><i class="fas fa-tag"></i> 标记基因 (Marker)</h4>
+                            <div class="form-group" style="margin-bottom: 0;" id="marker-div">
+                                {% for marker_item in plasmid.marker %}
+                                <div class="sub-form-group">
+                                    <input type="text" id="marker-gene" class="form-control" value="{{marker_item}}">
+                                    <button type="button" class="btn btn-secondary" id="removeMarkerButton_{{marker_item}}" onclick="removesubform(this)"><i class="fa-solid fa-xmark"></i></button>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <button type="button" class="btn btn-secondary" id="addMarkerButton" onclick="addmarker()"><i class="fa-solid fa-plus"></i></button>
+                        </div>
+                        
+                    </div>
+                    
+                    <div class="form-group" style="margin-top: 20px;">
+                        <label for="plasmid-notes">备注:</label>
+                        <input type="text" id="plasmid-notes" class="form-control" value="{{plasmid.note}}">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header">
+                    <h2><i class="fas fa-cut"></i> 酶切位点 (Scar)</h2>
+                </div>
+                <div class="section-content">
+                    <p style="margin-bottom: 15px; color: #475569;">质粒上的限制性内切酶酶切位点信息</p>
+                    
+                    <table class="scar-table">
+                        <thead>
+                            <tr>
+                                <th>限制酶</th>
+                                <th>位点状态/位置</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>BsmBI</td>
+                                <td><input type="text" value="{{plasmid.scar_info.bsmbi}}"></td>
+                            </tr>
+                            <tr>
+                                <td>BsaI</td>
+                                <td><input type="text" value="{{plasmid.scar_info.bsai}}"></td>
+                            </tr>
+                            <tr>
+                                <td>BbsI</td>
+                                <td><input type="text" value="{{plasmid.scar_info.bbsi}}"></td>
+                            </tr>
+                            <tr>
+                                <td>Aari</td>
+                                <td><input type="text" value="{{plasmid.scar_info.aari}}"></td>
+                            </tr>
+                            <tr>
+                                <td>SapI</td>
+                                <td><input type="text" value="{{plasmid.scar_info.sapi}}"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <div class="form-hint" style="margin-top: 10px;">"-" 表示该酶切位点不存在</div>
+                </div>
+            </div>
+
+
+            <div class="section">
+                <div class="section-header">
+                    <h2><i class="fas fa-cut"></i> 质粒层级关系</h2>
+                </div>
+                <div class="section-content">
+                    <div class="form-group" style="margin-bottom: 0;" id="parentPart-div">
+                        <p style="margin-bottom: 15px; color: #475569;">质粒上级元件</p>
+                        {% for Parent_Part in partparent %}
+                            <div class="sub-form-group">
+                                <input type="text" class="form-control" value="{{ Parent_Part }}">
+                                <button type="button" class="btn btn-secondary" onclick="removesubform(this)"><i class="fa-solid fa-xmark"></i></button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <button type="button" class="btn btn-secondary" id="addParentPartButton" onclick="addParentPart()"><i class="fa-solid fa-plus"></i></button>
+                    <div class="form-group" style="margin-bottom: 0;" id="parentBackbone-div">
+                        <p style="margin-bottom: 15px; color: #475569;">质粒上级载体</p>
+                        {% for Parent_Backbone in backboneparent %}
+                            <div class="sub-form-group">
+                                <input type="text" class="form-control" value="{{ Parent_Backbone }}">
+                                <button type="button" class="btn btn-secondary" onclick="removesubform(this)"><i class="fa-solid fa-xmark"></i></button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <button type="button" class="btn btn-secondary" id="addParentBackboneButton" onclick="addParentBackbone()"><i class="fa-solid fa-plus"></i></button>
+                    <div class="form-group" style="margin-bottom: 0;" id="parentPlasmid-div">
+                        <p style="margin-bottom: 15px; color: #475569;">质粒上级质粒</p>
+                        {% for Parent_Plasmid in plasmidparent %}
+                            <div class="sub-form-group">
+                                <input type="text" class="form-control" value="{{ Parent_Plasmid }}">
+                                <button type="button" class="btn btn-secondary" onclick="removesubform(this)"><i class="fa-solid fa-xmark"></i></button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <button type="button" class="btn btn-secondary" id="addParentPlasmidButton" onclick="addParentPlasmid()"><i class="fa-solid fa-plus"></i></button>
+                </div>
+            </div>
+            
+            
+            <div class="section">
+                <div class="section-header">
+                    <h2><i class="fas fa-code"></i> 载体序列</h2>
+                </div>
+                <div class="section-content">
+                    <div class="form-group">
+                        <label for="vector-sequence">DNA序列:</label>
+                        <textarea id="vector-sequence" class="form-control" style="margin-left: 5%;">{{plasmid.sequenceconfirm}}</textarea>
+                        <div class="form-hint">可以在此处编辑修改</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>序列预览:</label>
+                        <div class="sequence-box" id="sequence-preview">
+                            <!-- 序列将在这里显示 -->
+                            载体序列待输入...
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="btn-group">
+                <button type="button" class="btn btn-secondary" id="cancel-btn">
+                    <i class="fas fa-times"></i> 取消编辑
+                </button>
+                <button type="button" class="btn btn-primary" id="save-btn">
+                    <i class="fas fa-save"></i> 保存更改
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'LabDatabase/js/plasmidEdit.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>API 文档 - KitAssembly 文档站点</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "API \u6587\u6863";
+        var mkdocs_page_input_path = "api.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> KitAssembly 文档站点
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">API 文档</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#_1">基本约定</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_2">路由总览</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_3">页面接口</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#get-landing">GET /landing</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#get-index">GET /index</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_4">访客与反馈</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#post-register_visitor">POST /register_visitor</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#post-track_visit">POST /track_visit</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#post-submit_feedback">POST /submit_feedback</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_5">数据初始化</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#get-initdata">GET /initdata</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_6">自动组装</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#post-assembly">POST /assembly</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#get-task_statustaskid">GET /task_status/&lt;taskID&gt;</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#get-getassemblytaskidname">GET /getAssembly/&lt;taskID&gt;/&lt;name&gt;</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#golden-gate">Golden Gate 文件组装</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#post-gg_assemble">POST /gg_assemble</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_7">文件下载与文档站点</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#get-gettutorial">GET /getTutorial</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#get-getzip">GET /getZip</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#get-toturial">GET /toturial</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#get-toturialdoc_path">GET /toturial/&lt;doc_path&gt;</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#_8">下游服务依赖</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">首页</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">KitAssembly</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../kitassembly/overview/">工具概述</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../kitassembly/advantages/">核心优势</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../kitassembly/quickstart/">快速上手</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../kitassembly/resources/">入口与教程</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../kitassembly/message/">组委会寄语</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">KitAssembly 文档站点</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">API 文档</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="kitserver-api">KitServer API 文档<a class="headerlink" href="#kitserver-api" title="Permanent link">&para;</a></h1>
+<p>本文档根据 <code>kitapp/kitserver/urls.py</code> 与 <code>kitapp/kitserver/views.py</code> 生成，覆盖 KitAssembly 当前暴露的页面、JSON API、文件下载与组装接口。</p>
+<h2 id="_1">基本约定<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Base URL</td>
+<td>以 Django 部署根路径为准，本地开发通常为 <code>http://127.0.0.1:8000/</code></td>
+</tr>
+<tr>
+<td>JSON API</td>
+<td>请求体使用 <code>application/json</code></td>
+</tr>
+<tr>
+<td>文件上传</td>
+<td><code>/gg_assemble</code> 使用 <code>multipart/form-data</code></td>
+</tr>
+<tr>
+<td>Visitor Cookie</td>
+<td>默认 cookie 名为 <code>kitapp_visitor_id</code></td>
+</tr>
+<tr>
+<td>下游服务</td>
+<td>数据接口依赖 <code>WEBDATABASE_URL</code>，组装任务依赖 <code>LABDATABASE_URL</code></td>
+</tr>
+</tbody>
+</table>
+<p>常见错误响应：</p>
+<pre><code class="language-json">{
+  &quot;success&quot;: false,
+  &quot;message&quot;: &quot;method not allowed&quot;
+}
+</code></pre>
+<h2 id="_2">路由总览<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>路径</th>
+<th>方法</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/landing</code></td>
+<td>GET</td>
+<td>HTML</td>
+<td>渲染入口页</td>
+</tr>
+<tr>
+<td><code>/index</code></td>
+<td>GET</td>
+<td>HTML</td>
+<td>渲染主应用页</td>
+</tr>
+<tr>
+<td><code>/register_visitor</code></td>
+<td>POST</td>
+<td>JSON</td>
+<td>注册访客</td>
+</tr>
+<tr>
+<td><code>/register_vistor</code></td>
+<td>POST</td>
+<td>JSON</td>
+<td><code>register_visitor</code> 的兼容拼写</td>
+</tr>
+<tr>
+<td><code>/track_visit</code></td>
+<td>POST</td>
+<td>JSON</td>
+<td>记录访问日志</td>
+</tr>
+<tr>
+<td><code>/submit_feedback</code></td>
+<td>POST</td>
+<td>JSON</td>
+<td>提交反馈</td>
+</tr>
+<tr>
+<td><code>/initdata</code></td>
+<td>GET</td>
+<td>JSON</td>
+<td>获取固定列表的 part/backbone/plasmid 初始数据</td>
+</tr>
+<tr>
+<td><code>/assembly</code></td>
+<td>POST</td>
+<td>JSON</td>
+<td>提交自动组装任务</td>
+</tr>
+<tr>
+<td><code>/task_status/&lt;taskID&gt;</code></td>
+<td>GET</td>
+<td>JSON</td>
+<td>查询组装任务状态</td>
+</tr>
+<tr>
+<td><code>/getAssembly/&lt;taskID&gt;/&lt;name&gt;</code></td>
+<td>GET</td>
+<td>File</td>
+<td>下载组装结果 <code>.gb</code> 文件</td>
+</tr>
+<tr>
+<td><code>/gg_assemble</code></td>
+<td>POST</td>
+<td>File</td>
+<td>上传 GenBank 文件并执行 Golden Gate 组装</td>
+</tr>
+<tr>
+<td><code>/getTutorial</code></td>
+<td>GET</td>
+<td>File</td>
+<td>下载 <code>StarterDocumentation.pdf</code></td>
+</tr>
+<tr>
+<td><code>/getZip</code></td>
+<td>GET</td>
+<td>File</td>
+<td>下载 <code>PaperSI.zip</code></td>
+</tr>
+<tr>
+<td><code>/toturial</code></td>
+<td>GET</td>
+<td>HTML/File</td>
+<td>浏览已构建 MkDocs 站点首页</td>
+</tr>
+<tr>
+<td><code>/toturial/&lt;doc_path&gt;</code></td>
+<td>GET</td>
+<td>HTML/File</td>
+<td>浏览已构建 MkDocs 站点文件</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_3">页面接口<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<h3 id="get-landing">GET <code>/landing</code><a class="headerlink" href="#get-landing" title="Permanent link">&para;</a></h3>
+<p>返回 <code>landing.html</code>。该视图使用 <code>ensure_csrf_cookie</code>，会确保响应中包含 CSRF cookie。</p>
+<h3 id="get-index">GET <code>/index</code><a class="headerlink" href="#get-index" title="Permanent link">&para;</a></h3>
+<p>返回 <code>index.html</code>。该视图使用 <code>ensure_csrf_cookie</code>，会确保响应中包含 CSRF cookie。</p>
+<h2 id="_4">访客与反馈<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<h3 id="post-register_visitor">POST <code>/register_visitor</code><a class="headerlink" href="#post-register_visitor" title="Permanent link">&para;</a></h3>
+<p>注册访客资料。<code>/register_vistor</code> 是同一接口的旧拼写兼容路由。</p>
+<p>请求体：</p>
+<pre><code class="language-json">{
+  &quot;institution&quot;: &quot;Example University&quot;,
+  &quot;lab_name&quot;: &quot;Synthetic Biology Lab&quot;,
+  &quot;person_name&quot;: &quot;Alice&quot;
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>类型</th>
+<th>必填</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>institution</code></td>
+<td>string</td>
+<td>是</td>
+<td>机构名称</td>
+</tr>
+<tr>
+<td><code>lab_name</code></td>
+<td>string</td>
+<td>是</td>
+<td>实验室名称</td>
+</tr>
+<tr>
+<td><code>person_name</code></td>
+<td>string</td>
+<td>是</td>
+<td>联系人姓名</td>
+</tr>
+</tbody>
+</table>
+<p>成功响应：</p>
+<pre><code class="language-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: {
+    &quot;visitor_id&quot;: 1,
+    &quot;profile&quot;: {}
+  }
+}
+</code></pre>
+<p>错误状态：</p>
+<table>
+<thead>
+<tr>
+<th>状态码</th>
+<th>场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>400</code></td>
+<td>JSON 非法或必填字段缺失</td>
+</tr>
+<tr>
+<td><code>403</code></td>
+<td>服务端登录 WebDatabase 失败</td>
+</tr>
+<tr>
+<td><code>405</code></td>
+<td>非 POST 请求</td>
+</tr>
+<tr>
+<td><code>502</code></td>
+<td>下游请求失败或响应缺少 visitor id</td>
+</tr>
+</tbody>
+</table>
+<h3 id="post-track_visit">POST <code>/track_visit</code><a class="headerlink" href="#post-track_visit" title="Permanent link">&para;</a></h3>
+<p>记录访客访问日志。<code>visitor_id</code> 可来自请求体，也可来自 cookie。</p>
+<p>请求体：</p>
+<pre><code class="language-json">{
+  &quot;visitor_id&quot;: 1,
+  &quot;path&quot;: &quot;/index&quot;,
+  &quot;method&quot;: &quot;GET&quot;,
+  &quot;ip&quot;: &quot;127.0.0.1&quot;,
+  &quot;user_agent&quot;: &quot;Mozilla/5.0&quot;,
+  &quot;referer&quot;: &quot;http://127.0.0.1:8000/landing&quot;
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>类型</th>
+<th>必填</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>visitor_id</code></td>
+<td>string/int</td>
+<td>否</td>
+<td>缺省时读取 visitor cookie</td>
+</tr>
+<tr>
+<td><code>path</code></td>
+<td>string</td>
+<td>否</td>
+<td>缺省为当前请求路径</td>
+</tr>
+<tr>
+<td><code>method</code></td>
+<td>string</td>
+<td>否</td>
+<td>缺省为当前请求方法</td>
+</tr>
+<tr>
+<td><code>ip</code></td>
+<td>string</td>
+<td>否</td>
+<td>缺省为客户端 IP</td>
+</tr>
+<tr>
+<td><code>user_agent</code></td>
+<td>string</td>
+<td>否</td>
+<td>缺省为请求头 <code>User-Agent</code></td>
+</tr>
+<tr>
+<td><code>referer</code></td>
+<td>string</td>
+<td>否</td>
+<td>缺省为请求头 <code>Referer</code></td>
+</tr>
+</tbody>
+</table>
+<p>成功响应透传 WebDatabase <code>createVisitorAccessLog</code> 的 JSON，并刷新 visitor cookie。</p>
+<h3 id="post-submit_feedback">POST <code>/submit_feedback</code><a class="headerlink" href="#post-submit_feedback" title="Permanent link">&para;</a></h3>
+<p>提交问题或建议反馈。</p>
+<p>请求体：</p>
+<pre><code class="language-json">{
+  &quot;visitor_id&quot;: 1,
+  &quot;feedback_type&quot;: &quot;issue&quot;,
+  &quot;title&quot;: &quot;Cannot download result&quot;,
+  &quot;content&quot;: &quot;The generated GenBank file cannot be downloaded.&quot;,
+  &quot;contact_email&quot;: &quot;user@example.com&quot;,
+  &quot;page_path&quot;: &quot;/index&quot;
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>类型</th>
+<th>必填</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>visitor_id</code></td>
+<td>string/int</td>
+<td>否</td>
+<td>缺省时读取 visitor cookie</td>
+</tr>
+<tr>
+<td><code>feedback_type</code></td>
+<td>string</td>
+<td>是</td>
+<td>仅支持 <code>issue</code> 或 <code>suggestion</code></td>
+</tr>
+<tr>
+<td><code>title</code></td>
+<td>string</td>
+<td>是</td>
+<td>反馈标题</td>
+</tr>
+<tr>
+<td><code>content</code></td>
+<td>string</td>
+<td>是</td>
+<td>反馈内容</td>
+</tr>
+<tr>
+<td><code>contact_email</code></td>
+<td>string</td>
+<td>否</td>
+<td>联系邮箱</td>
+</tr>
+<tr>
+<td><code>page_path</code></td>
+<td>string</td>
+<td>否</td>
+<td>缺省为当前请求路径</td>
+</tr>
+</tbody>
+</table>
+<p>成功响应透传 WebDatabase <code>createVisitorFeedback</code> 的 JSON，并刷新 visitor cookie。</p>
+<h2 id="_5">数据初始化<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<h3 id="get-initdata">GET <code>/initdata</code><a class="headerlink" href="#get-initdata" title="Permanent link">&para;</a></h3>
+<p>获取前端初始数据。该接口通过固定名单从 WebDatabase 查询 E. coli 或 yeast 的 part、backbone、plasmid 信息。</p>
+<p>Query 参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>类型</th>
+<th>必填</th>
+<th>允许值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>currentCategory</code></td>
+<td>string</td>
+<td>是</td>
+<td><code>ecoli</code>、<code>yeast</code></td>
+</tr>
+<tr>
+<td><code>currentType</code></td>
+<td>string</td>
+<td>是</td>
+<td><code>part</code>、<code>backbone</code>、<code>plasmid</code></td>
+</tr>
+</tbody>
+</table>
+<p>示例：</p>
+<pre><code class="language-http">GET /initdata?currentCategory=ecoli&amp;currentType=part
+</code></pre>
+<p>成功响应：</p>
+<pre><code class="language-json">{
+  &quot;success&quot;: true,
+  &quot;data&quot;: [
+    {
+      &quot;name&quot;: &quot;pEcP01&quot;,
+      &quot;status&quot;: true,
+      &quot;type&quot;: &quot;promoter&quot;,
+      &quot;alias&quot;: &quot;XRHL1-P020&quot;,
+      &quot;length&quot;: &quot;123bp&quot;,
+      &quot;part&quot;: &quot;parent-part-name&quot;,
+      &quot;user&quot;: &quot;username&quot;
+    }
+  ]
+}
+</code></pre>
+<p><code>part</code> 类型返回字段：</p>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>name</code></td>
+<td>固定名单中的名称</td>
+</tr>
+<tr>
+<td><code>status</code></td>
+<td>是否查询成功</td>
+</tr>
+<tr>
+<td><code>type</code></td>
+<td><code>promoter</code>、<code>rbs</code>、<code>cds</code>、<code>terminator</code></td>
+</tr>
+<tr>
+<td><code>alias</code></td>
+<td>下游数据库 alias</td>
+</tr>
+<tr>
+<td><code>length</code></td>
+<td>带 <code>bp</code> 后缀的长度</td>
+</tr>
+<tr>
+<td><code>part</code></td>
+<td>父 part 名称</td>
+</tr>
+<tr>
+<td><code>ori</code></td>
+<td>yeast part 可能包含</td>
+</tr>
+<tr>
+<td><code>marker</code></td>
+<td>yeast part 可能包含</td>
+</tr>
+<tr>
+<td><code>user</code></td>
+<td>数据所有者</td>
+</tr>
+</tbody>
+</table>
+<p><code>backbone</code> 类型返回字段：</p>
+<pre><code class="language-json">{
+  &quot;name&quot;: &quot;pEcBB01&quot;,
+  &quot;status&quot;: true,
+  &quot;alias&quot;: &quot;XSYB1&quot;,
+  &quot;length&quot;: &quot;1234bp&quot;,
+  &quot;marker&quot;: &quot;KanR&quot;,
+  &quot;ori&quot;: &quot;pSC101&quot;,
+  &quot;user&quot;: &quot;username&quot;,
+  &quot;scar&quot;: {
+    &quot;bbsi&quot;: &quot;AB&quot;,
+    &quot;bsai&quot;: &quot;CD&quot;
+  }
+}
+</code></pre>
+<p><code>plasmid</code> 类型返回字段：</p>
+<pre><code class="language-json">{
+  &quot;name&quot;: &quot;pEcint01&quot;,
+  &quot;status&quot;: true,
+  &quot;alias&quot;: &quot;BZC034&quot;,
+  &quot;length&quot;: &quot;5000bp&quot;,
+  &quot;ori&quot;: &quot;p15A&quot;,
+  &quot;marker&quot;: &quot;AmpR&quot;,
+  &quot;user&quot;: &quot;username&quot;,
+  &quot;scar&quot;: {
+    &quot;bbsi&quot;: &quot;AB&quot;,
+    &quot;bsai&quot;: &quot;CD&quot;
+  }
+}
+</code></pre>
+<p>错误状态：</p>
+<table>
+<thead>
+<tr>
+<th>状态码</th>
+<th>场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>400</code></td>
+<td><code>currentCategory</code> 或 <code>currentType</code> 非法</td>
+</tr>
+<tr>
+<td><code>403</code></td>
+<td>服务端登录 WebDatabase 失败</td>
+</tr>
+<tr>
+<td><code>405</code></td>
+<td>非 GET 请求</td>
+</tr>
+<tr>
+<td><code>502</code></td>
+<td>下游请求失败</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_6">自动组装<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<h3 id="post-assembly">POST <code>/assembly</code><a class="headerlink" href="#post-assembly" title="Permanent link">&para;</a></h3>
+<p>提交组装任务。服务端会生成 UUID 作为任务名称，并调用 LabDatabase 的 <code>AssemblyWithoutRepo</code>。</p>
+<p>请求体：</p>
+<pre><code class="language-json">{
+  &quot;part&quot;: [&quot;pEcP01&quot;, &quot;pEcR01&quot;],
+  &quot;backbone&quot;: [3],
+  &quot;plasmid&quot;: [&quot;pEcint01&quot;]
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>类型</th>
+<th>必填</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>part</code></td>
+<td>array</td>
+<td>是</td>
+<td>part 名称列表。若仅 1 个元素，会先查询其父 part id</td>
+</tr>
+<tr>
+<td><code>backbone</code></td>
+<td>array</td>
+<td>是</td>
+<td>backbone id 列表，原样传给 LabDatabase</td>
+</tr>
+<tr>
+<td><code>plasmid</code></td>
+<td>array</td>
+<td>是</td>
+<td>plasmid 名称列表</td>
+</tr>
+</tbody>
+</table>
+<p>转发规则：</p>
+<table>
+<thead>
+<tr>
+<th>条件</th>
+<th>发送给 LabDatabase 的内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>part</code> 长度为 1</td>
+<td><code>part</code> 转为父 part id，<code>plasmid</code> 为空</td>
+</tr>
+<tr>
+<td><code>part</code> 长度不为 1</td>
+<td><code>part</code> 为空，<code>plasmid</code> 为 <code>part + plasmid</code></td>
+</tr>
+</tbody>
+</table>
+<p>成功响应在 LabDatabase 响应基础上增加 <code>name</code> 字段：</p>
+<pre><code class="language-json">{
+  &quot;success&quot;: true,
+  &quot;name&quot;: &quot;generated-uuid&quot;
+}
+</code></pre>
+<h3 id="get-task_statustaskid">GET <code>/task_status/&lt;taskID&gt;</code><a class="headerlink" href="#get-task_statustaskid" title="Permanent link">&para;</a></h3>
+<p>查询组装任务状态，响应内容和状态码透传 LabDatabase 的 <code>task_status/&lt;taskID&gt;</code>。</p>
+<p>示例：</p>
+<pre><code class="language-http">GET /task_status/4a66f6bb-82ad-4ff7-9b90-7e4d83e26220
+</code></pre>
+<h3 id="get-getassemblytaskidname">GET <code>/getAssembly/&lt;taskID&gt;/&lt;name&gt;</code><a class="headerlink" href="#get-getassemblytaskidname" title="Permanent link">&para;</a></h3>
+<p>下载组装结果文件。服务端会请求 LabDatabase 的 <code>getAssembly/&lt;name&gt;?task_id=&lt;taskID&gt;</code>，并以 <code>.gb</code> 文件返回。</p>
+<p>成功响应：</p>
+<table>
+<thead>
+<tr>
+<th>Header</th>
+<th>值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Content-Type</code></td>
+<td><code>application/octet-stream</code></td>
+</tr>
+<tr>
+<td><code>Content-Disposition</code></td>
+<td><code>attachment;filename=&lt;name&gt;.gb</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="golden-gate">Golden Gate 文件组装<a class="headerlink" href="#golden-gate" title="Permanent link">&para;</a></h2>
+<h3 id="post-gg_assemble">POST <code>/gg_assemble</code><a class="headerlink" href="#post-gg_assemble" title="Permanent link">&para;</a></h3>
+<p>上传至少两个 GenBank 文件，服务端执行 Golden Gate 组装并返回结果 GenBank 文件。</p>
+<p>请求类型：<code>multipart/form-data</code></p>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>类型</th>
+<th>必填</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>files</code></td>
+<td>file[]</td>
+<td>是</td>
+<td>至少 2 个 GenBank 文件</td>
+</tr>
+<tr>
+<td><code>enzyme</code></td>
+<td>string</td>
+<td>否</td>
+<td>默认为 <code>auto</code></td>
+</tr>
+<tr>
+<td><code>output_name</code></td>
+<td>string</td>
+<td>否</td>
+<td>输出文件名，默认为 <code>GG_Assembly_Result</code></td>
+</tr>
+</tbody>
+</table>
+<p>示例：</p>
+<pre><code class="language-bash">curl -X POST http://127.0.0.1:8000/gg_assemble \
+  -F &quot;files=@part1.gb&quot; \
+  -F &quot;files=@part2.gb&quot; \
+  -F &quot;enzyme=bsai&quot; \
+  -F &quot;output_name=my_assembly&quot;
+</code></pre>
+<p>成功响应：</p>
+<table>
+<thead>
+<tr>
+<th>Header</th>
+<th>值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Content-Type</code></td>
+<td><code>chemical/seq-na-genbank</code></td>
+</tr>
+<tr>
+<td><code>Content-Disposition</code></td>
+<td><code>attachment; filename="&lt;output_name&gt;.gb"</code></td>
+</tr>
+</tbody>
+</table>
+<p>错误状态：</p>
+<table>
+<thead>
+<tr>
+<th>状态码</th>
+<th>场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>400</code></td>
+<td>文件少于 2 个，或组装失败</td>
+</tr>
+<tr>
+<td><code>405</code></td>
+<td>非 POST 请求</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_7">文件下载与文档站点<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
+<h3 id="get-gettutorial">GET <code>/getTutorial</code><a class="headerlink" href="#get-gettutorial" title="Permanent link">&para;</a></h3>
+<p>下载 <code>kitapp/kitserver/static/StarterDocumentation.pdf</code>。文件不存在时返回 <code>{"success": false}</code>，状态码为 <code>400</code>。</p>
+<h3 id="get-getzip">GET <code>/getZip</code><a class="headerlink" href="#get-getzip" title="Permanent link">&para;</a></h3>
+<p>下载 <code>kitapp/kitserver/static/PaperSI.zip</code>。文件不存在时返回 <code>{"success": false}</code>，状态码为 <code>400</code>。</p>
+<h3 id="get-toturial">GET <code>/toturial</code><a class="headerlink" href="#get-toturial" title="Permanent link">&para;</a></h3>
+<p>返回已构建 MkDocs 站点的 <code>site/index.html</code>。</p>
+<h3 id="get-toturialdoc_path">GET <code>/toturial/&lt;doc_path&gt;</code><a class="headerlink" href="#get-toturialdoc_path" title="Permanent link">&para;</a></h3>
+<p>返回 <code>site</code> 目录下的静态文档文件。服务端会校验解析后的路径必须位于 <code>site</code> 目录内，防止目录穿越。</p>
+<p>示例：</p>
+<pre><code class="language-http">GET /toturial/kitassembly/overview/
+GET /toturial/assets/kitassembly/image1.png
+</code></pre>
+<p>找不到文件时返回 <code>404</code>。</p>
+<h2 id="_8">下游服务依赖<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>配置项</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>WEBDATABASE_URL</code></td>
+<td>查询 part/backbone/plasmid 元数据、访客和反馈接口</td>
+</tr>
+<tr>
+<td><code>LABDATABASE_URL</code></td>
+<td>提交组装任务、查询任务状态、下载组装结果</td>
+</tr>
+<tr>
+<td><code>API_LOGIN_URL</code></td>
+<td>登录下游服务，缺省为 <code>WEBDATABASE_URL + "login"</code></td>
+</tr>
+<tr>
+<td><code>API_LOGIN_USERNAME</code></td>
+<td>下游登录用户名</td>
+</tr>
+<tr>
+<td><code>API_LOGIN_PASSWORD</code></td>
+<td>下游登录密码</td>
+</tr>
+<tr>
+<td><code>API_LOGIN_USERNAME_FIELD</code></td>
+<td>登录表单用户名字段，默认 <code>username</code></td>
+</tr>
+<tr>
+<td><code>API_LOGIN_PASSWORD_FIELD</code></td>
+<td>登录表单密码字段，默认 <code>password</code></td>
+</tr>
+<tr>
+<td><code>API_LOGIN_NEXT</code></td>
+<td>可选登录跳转字段</td>
+</tr>
+</tbody>
+</table>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href=".." class="btn btn-neutral float-right" title="首页">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="None" class="fa fa-code-fork" style="color: #fcfcfc"> KitAssembly</a>
+        </span>
+    
+    
+    
+      <span><a href=".." style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

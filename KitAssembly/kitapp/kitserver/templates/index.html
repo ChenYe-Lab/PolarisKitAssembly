@@ -1,0 +1,1709 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <title>KitAssembly Bio Lab Console</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg: #f3f7f5;
+            --panel: #fbfdfc;
+            --panel-2: #eef5f2;
+            --ink: #17231f;
+            --ink-soft: #45534d;
+            --line: #ceded6;
+            --brand: #1d8f78;
+            --brand-dark: #116554;
+            --accent: #8ccf52;
+            --warning: #d16a1f;
+            --danger: #c83d38;
+            --shadow: 0 8px 24px rgba(15, 43, 35, 0.08);
+            --radius: 14px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at 10% 10%, #dff3e6 0%, rgba(223, 243, 230, 0) 42%),
+                radial-gradient(circle at 100% 0%, #e4f1ee 0%, rgba(228, 241, 238, 0) 48%),
+                var(--bg);
+            min-height: 100vh;
+            line-height: 1.45;
+        }
+
+        a{
+            text-decoration: none;
+            font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+            color:var(--ink);
+        }
+
+        a:hover {
+            color: #0056b3;
+            text-decoration: underline;    /* 可选：悬停时显示下划线 */
+        }
+
+        .grid-overlay {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0.18;
+            background-image:
+                linear-gradient(to right, rgba(23, 35, 31, 0.06) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(23, 35, 31, 0.06) 1px, transparent 1px);
+            background-size: 28px 28px;
+        }
+
+        .app-shell {
+            max-width: 1540px;
+            margin: 20px auto;
+            padding: 0 16px 20px;
+            animation: riseIn 0.5s ease-out both;
+        }
+
+        .topbar {
+            background: linear-gradient(120deg, #153f35 0%, #1f5f50 55%, #277261 100%);
+            border-radius: var(--radius);
+            color: #eefaf6;
+            padding: 18px 20px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .title-block h1 {
+            font-size: clamp(1.15rem, 2.8vw, 1.8rem);
+            font-weight: 700;
+            letter-spacing: 0.2px;
+        }
+
+        .title-block p {
+            color: #d7eee7;
+            font-size: 0.92rem;
+            margin-top: 4px;
+        }
+
+        .status-strip {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .lang-switch {
+            display: flex;
+            gap: 6px;
+            margin-left: 4px;
+        }
+
+        .lang-btn {
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            background: rgba(255, 255, 255, 0.14);
+            color: #eefaf6;
+            border-radius: 999px;
+            padding: 4px 10px;
+            font-size: 0.78rem;
+            cursor: pointer;
+        }
+
+        .lang-btn.active {
+            background: rgba(255, 255, 255, 0.26);
+            border-color: rgba(255, 255, 255, 0.5);
+            font-weight: 700;
+        }
+
+        .pill {
+            background: rgba(255, 255, 255, 0.13);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 999px;
+            padding: 6px 10px;
+            font-size: 0.84rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            font-family: "JetBrains Mono", monospace;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 280px 1fr 360px;
+            gap: 14px;
+        }
+
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .panel-head {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--line);
+            background: linear-gradient(180deg, #f7fcfa 0%, #eef6f2 100%);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-head h2 {
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .panel-head small {
+            color: var(--ink-soft);
+            font-family: "JetBrains Mono", monospace;
+            font-size: 0.75rem;
+        }
+
+        .taxonomy {
+            padding: 14px;
+            display: grid;
+            gap: 14px;
+        }
+
+        .tab-label {
+            font-size: 0.79rem;
+            font-weight: 600;
+            color: var(--ink-soft);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .category-tabs, .type-tabs {
+            display: grid;
+            gap: 8px;
+        }
+
+        .category-tab, .type-tab {
+            border: 1px solid var(--line);
+            background: #fff;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 0.93rem;
+            font-weight: 600;
+            color: var(--ink-soft);
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        .category-tab:hover, .type-tab:hover {
+            border-color: #9db9ad;
+            transform: translateY(-1px);
+        }
+
+        .category-tab.active, .type-tab.active {
+            background: linear-gradient(180deg, #dff4ee 0%, #c6ece2 100%);
+            color: #0f4f42;
+            border-color: #79b8a5;
+        }
+
+        .legend {
+            border-top: 1px dashed var(--line);
+            padding-top: 14px;
+            display: grid;
+            gap: 8px;
+            color: var(--ink-soft);
+            font-size: 0.82rem;
+        }
+
+        .legend code {
+            font-family: "JetBrains Mono", monospace;
+            font-size: 0.75rem;
+            color: #32584d;
+            background: #ecf5f2;
+            border: 1px solid #d7e7e1;
+            border-radius: 6px;
+            padding: 2px 6px;
+        }
+
+        .cards-wrap {
+            display: flex;
+            flex-direction: column;
+            min-height: 640px;
+        }
+
+        .cards-toolbar {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--line);
+            background: var(--panel-2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cards-toolbar strong {
+            font-size: 0.93rem;
+        }
+
+        .cards-toolbar span {
+            font-family: "JetBrains Mono", monospace;
+            color: var(--ink-soft);
+            font-size: 0.78rem;
+        }
+
+        .cards-container {
+            padding: 16px;
+            overflow: auto;
+            flex: 1;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 12px;
+        }
+
+        .card {
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 14px;
+            background: #fff;
+            transition: border-color 0.2s ease, transform 0.2s ease;
+            display: grid;
+            gap: 10px;
+            animation: fadeUp 0.24s ease both;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            border-color: #8eb2a5;
+        }
+
+        .card.selected {
+            border-color: var(--brand);
+            background: #f3fcf8;
+        }
+
+        .card-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-name {
+            font-weight: 700;
+            font-size: 0.98rem;
+            letter-spacing: 0.2px;
+            word-break: break-word;
+        }
+
+        .badge {
+            font-family: "JetBrains Mono", monospace;
+            font-size: 0.72rem;
+            padding: 4px 7px;
+            border-radius: 6px;
+            border: 1px solid #b7d4c8;
+            background: #edf9f4;
+            color: #235e4d;
+            white-space: nowrap;
+        }
+
+        .meta {
+            display: grid;
+            gap: 6px;
+            font-size: 0.84rem;
+            color: var(--ink-soft);
+        }
+
+        .meta-item b {
+            color: var(--ink);
+            font-weight: 600;
+            margin-right: 4px;
+        }
+
+        .select-btn {
+            border: 1px solid #b9d5cb;
+            background: linear-gradient(180deg, #ffffff 0%, #f0f7f4 100%);
+            color: #18483c;
+            border-radius: 10px;
+            padding: 9px 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        .select-btn:hover {
+            border-color: #7cb3a1;
+        }
+
+        .select-btn.selected {
+            border-color: var(--brand-dark);
+            background: linear-gradient(180deg, #2ba48b 0%, #1e8c75 100%);
+            color: #fff;
+        }
+
+        .selection-body {
+            display: grid;
+            gap: 12px;
+            padding: 14px;
+        }
+
+        .selection-stats {
+            background: var(--panel-2);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 10px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .selection-stats b {
+            font-size: 1.1rem;
+            font-family: "JetBrains Mono", monospace;
+            color: var(--brand-dark);
+        }
+
+        .selected-list {
+            list-style: none;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            max-height: 410px;
+            overflow: auto;
+            padding: 8px;
+            background: #fff;
+        }
+
+        .selected-list li {
+            border: 1px solid #ddebe5;
+            border-radius: 8px;
+            padding: 8px 10px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            align-items: center;
+            background: #f8fbfa;
+        }
+
+        .selected-list li:last-child {
+            margin-bottom: 0;
+        }
+
+        .selected-name {
+            font-weight: 700;
+            font-size: 0.9rem;
+            word-break: break-word;
+        }
+
+        .selected-sub {
+            font-family: "JetBrains Mono", monospace;
+            font-size: 0.74rem;
+            color: var(--ink-soft);
+        }
+
+        .remove-btn {
+            border: 1px solid #e6b9b7;
+            color: var(--danger);
+            background: #fff2f1;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            flex: 0 0 30px;
+        }
+
+        .no-items {
+            text-align: center;
+            color: var(--ink-soft);
+            font-size: 0.87rem;
+            padding: 22px 8px;
+        }
+
+        .assemble-box {
+            background: linear-gradient(180deg, #eff9f4 0%, #e5f4ed 100%);
+            border: 1px solid #cbe2d7;
+            border-radius: 10px;
+            padding: 12px;
+            display: grid;
+            gap: 10px;
+        }
+
+        .assemble-hint {
+            font-size: 0.84rem;
+            color: var(--ink-soft);
+        }
+
+        .assemble-btn {
+            border: 1px solid #1f7d69;
+            background: linear-gradient(180deg, #299e85 0%, #1d8f78 100%);
+            color: #fff;
+            border-radius: 10px;
+            padding: 11px 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        .assemble-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .assemble-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.55;
+            transform: none;
+        }
+
+        .task-status {
+            font-family: "JetBrains Mono", monospace;
+            font-size: 0.77rem;
+            border: 1px solid #d9e8e2;
+            background: #f8fbfa;
+            border-radius: 8px;
+            padding: 8px 10px;
+            color: #425b53;
+            min-height: 34px;
+        }
+
+        .success-cache {
+            border-top: 1px solid var(--line);
+            padding: 14px;
+            display: grid;
+            gap: 10px;
+            background: linear-gradient(180deg, #fcfffd 0%, #f4faf7 100%);
+        }
+
+        .success-cache-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 10px;
+        }
+
+        .success-cache-head h3 {
+            margin: 0;
+            font-size: 0.98rem;
+            color: var(--ink);
+        }
+
+        .success-cache-head small {
+            color: var(--ink-soft);
+            font-size: 0.76rem;
+        }
+
+        .success-cache-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .feedback-box {
+            border-top: 1px solid var(--line);
+            padding: 16px;
+            background: linear-gradient(180deg, #f9fcfb 0%, #f2f8f5 100%);
+            display: grid;
+            gap: 12px;
+        }
+
+        .feedback-box h3 {
+            font-size: 0.98rem;
+            font-weight: 700;
+        }
+
+        .feedback-box p {
+            color: var(--ink-soft);
+            font-size: 0.84rem;
+        }
+
+        .feedback-form {
+            display: grid;
+            gap: 10px;
+        }
+
+        .feedback-field {
+            display: grid;
+            gap: 6px;
+        }
+
+        .feedback-field label {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--ink-soft);
+        }
+
+        .feedback-field input,
+        .feedback-field select,
+        .feedback-field textarea {
+            width: 100%;
+            border: 1px solid #c8dcd4;
+            background: #fff;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font: inherit;
+            color: var(--ink);
+        }
+
+        .feedback-field textarea {
+            min-height: 108px;
+            resize: vertical;
+        }
+
+        .feedback-field input:focus,
+        .feedback-field select:focus,
+        .feedback-field textarea:focus {
+            outline: none;
+            border-color: #7cb3a1;
+            box-shadow: 0 0 0 3px rgba(29, 143, 120, 0.12);
+        }
+
+        .feedback-submit {
+            border: 1px solid #1f7d69;
+            background: linear-gradient(180deg, #299e85 0%, #1d8f78 100%);
+            color: #fff;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .feedback-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .feedback-message {
+            min-height: 20px;
+            font-size: 0.82rem;
+            color: var(--ink-soft);
+        }
+
+        .feedback-message.error {
+            color: var(--danger);
+        }
+
+        .cache-plan-btn {
+            border: 1px solid #bed7cc;
+            background: #ffffff;
+            color: #18483c;
+            border-radius: 999px;
+            padding: 8px 12px;
+            font-size: 0.82rem;
+            font-family: "JetBrains Mono", monospace;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        .cache-plan-btn:hover {
+            border-color: #7cb3a1;
+            background: #eef7f3;
+        }
+
+        .cache-plan-btn.selected {
+            border-color: var(--brand-dark);
+            background: linear-gradient(180deg, #2ba48b 0%, #1e8c75 100%);
+            color: #fff;
+        }
+
+        .visitor-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 35, 30, 0.44);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 50;
+        }
+
+        .visitor-modal.visible {
+            display: flex;
+        }
+
+        .visitor-panel {
+            width: min(100%, 460px);
+            background: #fcfffd;
+            border: 1px solid #cfe0d9;
+            border-radius: 18px;
+            box-shadow: 0 22px 60px rgba(15, 43, 35, 0.18);
+            padding: 22px;
+            display: grid;
+            gap: 14px;
+        }
+
+        .visitor-panel h3 {
+            font-size: 1.15rem;
+            font-weight: 700;
+        }
+
+        .visitor-panel p {
+            color: var(--ink-soft);
+            font-size: 0.9rem;
+        }
+
+        .visitor-form {
+            display: grid;
+            gap: 12px;
+        }
+
+        .visitor-field {
+            display: grid;
+            gap: 6px;
+        }
+
+        .visitor-field label {
+            font-size: 0.86rem;
+            font-weight: 600;
+            color: var(--ink-soft);
+        }
+
+        .visitor-field input {
+            width: 100%;
+            border: 1px solid #c8dcd4;
+            background: #fff;
+            border-radius: 10px;
+            padding: 11px 12px;
+            font: inherit;
+            color: var(--ink);
+        }
+
+        .visitor-field input:focus {
+            outline: none;
+            border-color: #7cb3a1;
+            box-shadow: 0 0 0 3px rgba(29, 143, 120, 0.12);
+        }
+
+        .visitor-actions {
+            display: grid;
+            gap: 10px;
+        }
+
+        .visitor-submit {
+            border: 1px solid #1f7d69;
+            background: linear-gradient(180deg, #299e85 0%, #1d8f78 100%);
+            color: #fff;
+            border-radius: 10px;
+            padding: 11px 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .visitor-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .visitor-message {
+            min-height: 20px;
+            font-size: 0.84rem;
+            color: var(--ink-soft);
+        }
+
+        .visitor-message.error {
+            color: var(--danger);
+        }
+
+        @keyframes riseIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 1260px) {
+            .layout {
+                grid-template-columns: 240px 1fr 320px;
+            }
+        }
+
+        @media (max-width: 980px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+
+            .cards-wrap {
+                min-height: 420px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="grid-overlay"></div>
+    <div class="visitor-modal" id="visitorModal" aria-hidden="true">
+        <div class="visitor-panel">
+            <div>
+                <h3 data-i18n="visitor.title">Visitor Registration</h3>
+                <p data-i18n="visitor.subtitle">Before using KitAssembly, please register your institution, lab, and name once.</p>
+            </div>
+            <form class="visitor-form" id="visitorForm">
+                <div class="visitor-field">
+                    <label for="visitorInstitution" data-i18n="visitor.institution">Institution</label>
+                    <input id="visitorInstitution" name="institution" type="text" autocomplete="organization" required>
+                </div>
+                <div class="visitor-field">
+                    <label for="visitorLabName" data-i18n="visitor.lab">Lab / Group</label>
+                    <input id="visitorLabName" name="lab_name" type="text" autocomplete="organization-title" required>
+                </div>
+                <div class="visitor-field">
+                    <label for="visitorPersonName" data-i18n="visitor.person">Name</label>
+                    <input id="visitorPersonName" name="person_name" type="text" autocomplete="name" required>
+                </div>
+                <div class="visitor-actions">
+                    <button class="visitor-submit" id="visitorSubmitBtn" type="submit" data-i18n="visitor.submit">Save And Continue</button>
+                    <div class="visitor-message" id="visitorMessage"></div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="app-shell">
+        <header class="topbar">
+            <div class="title-block">
+                <h1 data-i18n="title.main"><i class="fa-solid fa-dna"></i> KitAssembly Bio Lab Console</h1>
+                <p data-i18n="title.subtitle">Select parts from E.coli or S. cerevisiae and submit one-click assembly plans.</p>
+            </div>
+            <div class="status-strip">
+                <div class="pill" data-i18n="pill.source"><i class="fa-solid fa-database"></i> Source: WebDatabase</div>
+                <div class="pill" data-i18n="pill.workflow"><i class="fa-solid fa-gears"></i> Workflow: AssemblyWithoutRepo</div>
+                <div class="pill" data-i18n="pill.output"><i class="fa-solid fa-file-arrow-down"></i> Output: GenBank (.gb)</div>
+                <div class="lang-switch">
+                    <button class="lang-btn" id="langZh" type="button">中文</button>
+                    <button class="lang-btn" id="langEn" type="button">EN</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="layout">
+            <aside class="panel">
+                <div class="panel-head">
+                    <h2 data-i18n="taxonomy.title">Taxonomy</h2>
+                    <small data-i18n="taxonomy.filters">filters</small>
+                </div>
+                <div class="taxonomy">
+                    <section>
+                        <p class="tab-label" data-i18n="taxonomy.category">Category</p>
+                        <div class="category-tabs">
+                            <button class="category-tab active" data-category="ecoli" data-i18n="taxonomy.ecoli">E.coli</button>
+                            <button class="category-tab" data-category="yeast" data-i18n="taxonomy.yeast">S. cerevisiae</button>
+                        </div>
+                    </section>
+                    <section>
+                        <p class="tab-label" data-i18n="taxonomy.componentType">Component Type</p>
+                        <div class="type-tabs">
+                            <button class="type-tab active" data-type="part" data-i18n="taxonomy.part">Part</button>
+                            <button class="type-tab" data-type="backbone" data-i18n="taxonomy.backbone">Backbone</button>
+                            <button class="type-tab" data-type="plasmid" data-i18n="taxonomy.plasmid">Plasmid</button>
+                        </div>
+                    </section>
+                    <section class="legend">
+                        <div data-i18n="legend.part"><code>part</code> Promoter / RBS / CDS / Terminator</div>
+                        <div data-i18n="legend.backbone"><code>backbone</code> Marker + Ori metadata</div>
+                        <div data-i18n="legend.plasmid"><code>plasmid</code> Directly assembled templates</div>
+                        <div data-i18n="legend.tutorial"><code>tutorial</code><a href="{% static 'StarterDocumentation.pdf' %}" target="_blank"> Begineer's Guide</a></div>
+                        <div data-i18n="legend.paper"><code>paper</code><a href="/kitserver/getZip"> Paper & SI</a></div>
+                    </section>
+                </div>
+            </aside>
+
+            <section class="panel cards-wrap">
+                <div class="panel-head">
+                    <h2 data-i18n="library.title">Component Library</h2>
+                    <small id="libraryTag">ecoli / part</small>
+                </div>
+                <div class="cards-toolbar">
+                    <strong id="cardsSummary">Loading components...</strong>
+                    <span id="readyHint">status: pending</span>
+                </div>
+                <div class="cards-container">
+                    <div class="cards-grid" id="cardsGrid"></div>
+                </div>
+            </section>
+
+            <aside class="panel">
+                <div class="panel-head">
+                    <h2 data-i18n="selection.title">Selection & Run</h2>
+                    <small data-i18n="selection.queue">task queue</small>
+                </div>
+                <div class="selection-body">
+                    <div class="selection-stats">
+                        <span data-i18n="selection.selectedComponents">Selected Components</span>
+                        <b id="selectedCount">0</b>
+                    </div>
+                    <ul class="selected-list" id="selectedList">
+                        <li class="no-items" data-i18n="selection.noItems">No components selected yet.</li>
+                    </ul>
+                    <div class="assemble-box">
+                        <p class="assemble-hint" data-i18n="selection.hint">At least 2 components are required to start an assembly task.</p>
+                        <button class="assemble-btn" id="assembleBtn" disabled>
+                            <i class="fa-solid fa-play"></i> <span data-i18n="selection.startAssembly">Start Assembly</span>
+                        </button>
+                        <div class="task-status" id="taskStatus">task: idle</div>
+                    </div>
+                </div>
+                <div class="success-cache">
+                    <div class="success-cache-head">
+                        <h3 data-i18n="selection.cachedPlans">Successful Plans</h3>
+                        <small data-i18n="selection.cachedHint">Click a plan name to add it as a plasmid.</small>
+                    </div>
+                    <div class="success-cache-list" id="successfulPlansList">
+                        <div class="no-items" data-i18n="selection.noCachedPlans">No successful plans cached yet.</div>
+                    </div>
+                </div>
+                <div class="feedback-box">
+                    <div>
+                        <h3 data-i18n="feedback.title">Questions & Feedback</h3>
+                        <p data-i18n="feedback.subtitle">Share issues, suggestions, or anything unclear on the homepage.</p>
+                    </div>
+                    <form class="feedback-form" id="feedbackForm">
+                        <div class="feedback-field">
+                            <label for="feedbackType" data-i18n="feedback.type">Type</label>
+                            <select id="feedbackType" name="feedback_type">
+                                <option value="issue" data-i18n="feedback.typeIssue">Issue</option>
+                                <option value="suggestion" data-i18n="feedback.typeSuggestion">Suggestion</option>
+                            </select>
+                        </div>
+                        <div class="feedback-field">
+                            <label for="feedbackTitle" data-i18n="feedback.subject">Title</label>
+                            <input id="feedbackTitle" name="title" type="text" maxlength="200" placeholder="Brief summary">
+                        </div>
+                        <div class="feedback-field">
+                            <label for="feedbackContent" data-i18n="feedback.content">Details</label>
+                            <textarea id="feedbackContent" name="content" placeholder="Describe the issue or your suggestion"></textarea>
+                        </div>
+                        <div class="feedback-field">
+                            <label for="feedbackContact" data-i18n="feedback.contact">Contact Email (Optional)</label>
+                            <input id="feedbackContact" name="contact_email" type="email" placeholder="name@example.com">
+                        </div>
+                        <button class="feedback-submit" id="feedbackSubmitBtn" type="submit" data-i18n="feedback.submit">Submit Feedback</button>
+                        <div class="feedback-message" id="feedbackMessage"></div>
+                    </form>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <script>
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        const I18N = {
+            zh: {
+                "title.main": "KitAssembly 生物组装控制台",
+                "title.subtitle": "从 E.coli 或 S. cerevisiae 选择元件，一键提交组装方案。",
+                "pill.source": "数据源: WebDatabase",
+                "pill.workflow": "流程: AssemblyWithoutRepo",
+                "pill.output": "输出: GenBank (.gb)",
+                "taxonomy.title": "分类",
+                "taxonomy.filters": "筛选",
+                "taxonomy.category": "类别",
+                "taxonomy.ecoli": "大肠杆菌",
+                "taxonomy.yeast": "酵母",
+                "taxonomy.componentType": "元件类型",
+                "taxonomy.part": "元件",
+                "taxonomy.backbone": "骨架",
+                "taxonomy.plasmid": "质粒",
+                "legend.part": "<code>part</code> 启动子 / RBS / CDS / 终止子",
+                "legend.backbone": "<code>backbone</code> 抗性标记 + 复制起点信息",
+                "legend.plasmid": "<code>plasmid</code> 直接组装模板",
+                "legend.tutorial": "<code>tutorial</code><a href='{% static 'StarterDocumentation.pdf' %}'> 使用指南</a>",
+                "legend.paper": "<code>paper</code><a href='/kitserver/getZip'> 文献及附件</a>",
+                "library.title": "元件库",
+                "selection.title": "已选与运行",
+                "selection.queue": "任务队列",
+                "selection.selectedComponents": "已选元件",
+                "selection.noItems": "当前还未选择任何元件。",
+                "selection.hint": "至少选择 2 个元件才能开始组装任务。",
+                "selection.startAssembly": "开始组装",
+                "card.name": "名称",
+                "card.length": "长度",
+                "card.type": "类型",
+                "card.part": "所用元件",
+                "card.marker": "标记",
+                "card.ori": "复制起点",
+                "card.scar_bbsi": "Scar (bbsi)",
+                "card.scar_bsai": "Scar (bsai)",
+                "card.user": "创建者",
+                "cards.loading": "正在加载元件...",
+                "cards.available": "可用元件数: {count}",
+                "cards.empty": "该分类下暂无可用元件。",
+                "cards.loadFailed": "加载元件库失败。",
+                "select.selected": "已选择",
+                "select.choose": "选择",
+                "status.pending": "状态: 等待中",
+                "status.ready": "状态: 就绪",
+                "status.empty": "状态: 空",
+                "task.idle": "任务: 空闲",
+                "task.initdataFailed": "任务: 初始化数据失败",
+                "task.submitting": "任务: 提交中...",
+                "task.queued": "任务: 已排队 ({id})",
+                "task.polling": "任务: 轮询中 {id}",
+                "task.completedDownloading": "任务: 已完成，下载中...",
+                "task.failed": "任务: 失败",
+                "task.running": "任务: {status}",
+                "task.pollingError": "任务: 轮询异常",
+                "task.completed": "任务: 已完成",
+                "msg.submitFailed": "提交失败: {msg}",
+                "msg.pollFailed": "轮询失败: {msg}",
+                "msg.assemblyFailed": "组装失败",
+                "msg.assemblyCompleted": "组装完成。",
+                "msg.processFailed": "处理失败: {msg}",
+                "remove.title": "移除"
+                ,"visitor.title": "访客登记"
+                ,"visitor.subtitle": "首次使用 KitAssembly 时，请先登记机构、课题组和姓名。"
+                ,"visitor.institution": "机构"
+                ,"visitor.lab": "课题组"
+                ,"visitor.person": "姓名"
+                ,"visitor.submit": "保存并继续"
+                ,"visitor.saving": "正在保存登记信息..."
+                ,"visitor.required": "请完整填写机构、课题组和姓名。"
+                ,"visitor.trackFailed": "访问记录更新失败: {msg}"
+                ,"visitor.registerFailed": "登记失败: {msg}"
+            },
+            en: {
+                "title.main": "KitAssembly Bio Lab Console",
+                "title.subtitle": "Select parts from E.coli or S. cerevisiae and submit one-click assembly plans.",
+                "pill.source": "Source: WebDatabase",
+                "pill.workflow": "Workflow: AssemblyWithoutRepo",
+                "pill.output": "Output: GenBank (.gb)",
+                "taxonomy.title": "Taxonomy",
+                "taxonomy.filters": "filters",
+                "taxonomy.category": "Category",
+                "taxonomy.ecoli": "E.coli",
+                "taxonomy.yeast": "S. cerevisiae",
+                "taxonomy.componentType": "Component Type",
+                "taxonomy.part": "Part",
+                "taxonomy.backbone": "Backbone",
+                "taxonomy.plasmid": "Plasmid",
+                "legend.part": "<code>part</code> Promoter / RBS / CDS / Terminator",
+                "legend.backbone": "<code>backbone</code> Marker + Ori metadata",
+                "legend.plasmid": "<code>plasmid</code> Directly assembled templates",
+                "library.title": "Component Library",
+                "legend.tutorial": "<code>tutorial</code><a href='{% static 'StarterDocumentation.pdf' %}'> Begineer's Guide</a>",
+                "legend.paper":"<code>paper</code><a href='/kitserver/getZip'> Paper & SI</a>",
+                "selection.title": "Selection & Run",
+                "selection.queue": "task queue",
+                "selection.selectedComponents": "Selected Components",
+                "selection.noItems": "No components selected yet.",
+                "selection.hint": "At least 2 components are required to start an assembly task.",
+                "selection.startAssembly": "Start Assembly",
+                "selection.cachedPlans": "Successful Plans",
+                "selection.cachedHint": "Click a plan name to add it as a plasmid.",
+                "selection.noCachedPlans": "No successful plans cached yet.",
+                "card.name": "Name",
+                "card.length": "Length",
+                "card.type": "Type",
+                "card.part": "Part",
+                "card.marker": "Marker",
+                "card.ori": "Ori",
+                "card.scar_bbsi": "Scar (bbsi)",
+                "card.scar_bsai": "Scar (bsai)",
+                "card.user": "User",
+                "cards.loading": "Loading components...",
+                "cards.available": "Available components: {count}",
+                "cards.empty": "No components available in this category.",
+                "cards.loadFailed": "Failed to load component library.",
+                "select.selected": "Selected",
+                "select.choose": "Select",
+                "status.pending": "status: pending",
+                "status.ready": "status: ready",
+                "status.empty": "status: empty",
+                "task.idle": "task: idle",
+                "task.initdataFailed": "task: initdata failed",
+                "task.submitting": "task: submitting...",
+                "task.queued": "task: queued ({id})",
+                "task.polling": "task: polling {id}",
+                "task.completedDownloading": "task: completed, downloading...",
+                "task.failed": "task: failed",
+                "task.running": "task: {status}",
+                "task.pollingError": "task: polling error",
+                "task.completed": "task: completed",
+                "msg.submitFailed": "submit failed: {msg}",
+                "msg.pollFailed": "poll failed: {msg}",
+                "msg.assemblyFailed": "assembly failed",
+                "msg.assemblyCompleted": "Assembly completed.",
+                "msg.processFailed": "process failed: {msg}",
+                "remove.title": "remove",
+                "visitor.title": "Visitor Registration",
+                "visitor.subtitle": "Before using KitAssembly, please register your institution, lab, and name once.",
+                "visitor.institution": "Institution",
+                "visitor.lab": "Lab / Group",
+                "visitor.person": "Name",
+                "visitor.submit": "Save And Continue",
+                "visitor.saving": "Saving visitor profile...",
+                "visitor.required": "Please complete institution, lab, and name.",
+                "visitor.trackFailed": "Visit tracking failed: {msg}",
+                "visitor.registerFailed": "Registration failed: {msg}",
+                "feedback.title": "Questions & Feedback",
+                "feedback.subtitle": "Share issues, suggestions, or anything unclear on the homepage.",
+                "feedback.type": "Type",
+                "feedback.typeIssue": "Issue",
+                "feedback.typeSuggestion": "Suggestion",
+                "feedback.subject": "Title",
+                "feedback.content": "Details",
+                "feedback.contact": "Contact Email (Optional)",
+                "feedback.submit": "Submit Feedback",
+                "feedback.sending": "Submitting feedback...",
+                "feedback.success": "Thanks. Your feedback has been saved.",
+                "feedback.required": "Please complete title and details.",
+                "feedback.failed": "Feedback submission failed: {msg}"
+            }
+        };
+
+        const VISITOR_COOKIE_NAME = 'kitapp_visitor_id';
+        const SUCCESSFUL_PLANS_STORAGE_KEY = 'kitapp_successful_plans';
+        let currentCategory = 'ecoli';
+        let currentType = 'part';
+        let selectedComponents = [];
+        let successfulPlans = [];
+        let currentLang = localStorage.getItem('kitapp_lang') || 'zh';
+
+        const cardsGrid = document.getElementById('cardsGrid');
+        const selectedList = document.getElementById('selectedList');
+        const selectedCount = document.getElementById('selectedCount');
+        const assembleBtn = document.getElementById('assembleBtn');
+        const taskStatus = document.getElementById('taskStatus');
+        const libraryTag = document.getElementById('libraryTag');
+        const cardsSummary = document.getElementById('cardsSummary');
+        const readyHint = document.getElementById('readyHint');
+        const langZh = document.getElementById('langZh');
+        const langEn = document.getElementById('langEn');
+        const visitorModal = document.getElementById('visitorModal');
+        const visitorForm = document.getElementById('visitorForm');
+        const visitorInstitution = document.getElementById('visitorInstitution');
+        const visitorLabName = document.getElementById('visitorLabName');
+        const visitorPersonName = document.getElementById('visitorPersonName');
+        const visitorSubmitBtn = document.getElementById('visitorSubmitBtn');
+        const visitorMessage = document.getElementById('visitorMessage');
+        const successfulPlansList = document.getElementById('successfulPlansList');
+        const feedbackForm = document.getElementById('feedbackForm');
+        const feedbackType = document.getElementById('feedbackType');
+        const feedbackTitle = document.getElementById('feedbackTitle');
+        const feedbackContent = document.getElementById('feedbackContent');
+        const feedbackContact = document.getElementById('feedbackContact');
+        const feedbackSubmitBtn = document.getElementById('feedbackSubmitBtn');
+        const feedbackMessage = document.getElementById('feedbackMessage');
+
+        let componentEcoliPartList = [];
+        let componentEcoliBackboneList = [];
+        let componentEcoliPlasmidList = [];
+        let componentYeastPartList = [];
+        let componentYeastBackboneList = [];
+        let componentYeastPlasmidList = [];
+
+        const listMap = {
+            ecoli: {
+                part: () => componentEcoliPartList,
+                backbone: () => componentEcoliBackboneList,
+                plasmid: () => componentEcoliPlasmidList
+            },
+            yeast: {
+                part: () => componentYeastPartList,
+                backbone: () => componentYeastBackboneList,
+                plasmid: () => componentYeastPlasmidList
+            }
+        };
+
+        function componentKey(name, category, type) {
+            return `${category}::${type}::${name}`;
+        }
+
+        function loadSuccessfulPlans() {
+            try {
+                const raw = sessionStorage.getItem(SUCCESSFUL_PLANS_STORAGE_KEY);
+                const parsed = JSON.parse(raw || '[]');
+                return Array.isArray(parsed) ? parsed.filter(Boolean) : [];
+            } catch (error) {
+                return [];
+            }
+        }
+
+        function saveSuccessfulPlans() {
+            sessionStorage.setItem(SUCCESSFUL_PLANS_STORAGE_KEY, JSON.stringify(successfulPlans));
+        }
+
+        function t(key, vars = {}) {
+            const fallback = (I18N.en && I18N.en[key]) || key;
+            let text = (I18N[currentLang] && I18N[currentLang][key]) || fallback;
+            Object.keys(vars).forEach(k => {
+                text = text.replaceAll(`{${k}}`, String(vars[k]));
+            });
+            return text;
+        }
+
+        function applyI18nStatic() {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                const value = t(key);
+                if (value.includes('<code>')) {
+                    el.innerHTML = value;
+                } else {
+                    // keep leading icon if present.
+                    if (el.firstElementChild && el.firstElementChild.tagName === 'I') {
+                        const iconHtml = el.firstElementChild.outerHTML;
+                        el.innerHTML = `${iconHtml} ${value}`;
+                    } else {
+                        el.textContent = value;
+                    }
+                }
+            });
+            cardsSummary.textContent = t('cards.loading');
+            readyHint.textContent = t('status.pending');
+            renderSuccessfulPlans();
+            if (selectedComponents.length === 0) {
+                selectedList.innerHTML = `<li class="no-items">${t('selection.noItems')}</li>`;
+            }
+            if (taskStatus.textContent.trim() === '' || taskStatus.textContent.includes('idle') || taskStatus.textContent.includes('空闲')) {
+                taskStatus.textContent = t('task.idle');
+            }
+        }
+
+        function setLanguage(lang) {
+            currentLang = lang === 'en' ? 'en' : 'zh';
+            localStorage.setItem('kitapp_lang', currentLang);
+            langZh.classList.toggle('active', currentLang === 'zh');
+            langEn.classList.toggle('active', currentLang === 'en');
+            document.documentElement.lang = currentLang === 'zh' ? 'zh-CN' : 'en';
+            applyI18nStatic();
+            renderCards();
+            updateSelectedList();
+            renderSuccessfulPlans();
+        }
+
+        function updateTopHints(totalLoaded) {
+            readyHint.textContent = totalLoaded > 0 ? t('status.ready') : t('status.empty');
+        }
+
+        function normalizeText(value) {
+            if (Array.isArray(value)) {
+                return value.join(', ');
+            }
+            return value ?? '-';
+        }
+
+        function getCookie(name) {
+            const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const match = document.cookie.match(new RegExp(`(?:^|; )${escaped}=([^;]*)`));
+            return match ? decodeURIComponent(match[1]) : '';
+        }
+
+        function getVisitorId() {
+            return getCookie(VISITOR_COOKIE_NAME);
+        }
+
+        function setVisitorMessage(message, isError = false) {
+            visitorMessage.textContent = message || '';
+            visitorMessage.classList.toggle('error', Boolean(isError));
+        }
+
+        function setFeedbackMessage(message, isError = false) {
+            feedbackMessage.textContent = message || '';
+            feedbackMessage.classList.toggle('error', Boolean(isError));
+        }
+
+        function openVisitorModal() {
+            visitorModal.classList.add('visible');
+            visitorModal.setAttribute('aria-hidden', 'false');
+            setVisitorMessage('');
+            setTimeout(() => visitorInstitution.focus(), 30);
+        }
+
+        function closeVisitorModal() {
+            visitorModal.classList.remove('visible');
+            visitorModal.setAttribute('aria-hidden', 'true');
+            setVisitorMessage('');
+        }
+
+        async function registerVisitor(profile) {
+            const response = await fetch('/kitserver/register_visitor', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify(profile)
+            });
+            return response.json();
+        }
+
+        async function trackVisit(pathname = window.location.pathname) {
+            const visitorId = getVisitorId();
+            if (!visitorId) {
+                throw new Error('visitor_id not found');
+            }
+
+            const response = await fetch('/kitserver/track_visit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({
+                    visitor_id: visitorId,
+                    path: pathname,
+                    method: 'POST',
+                    referer: document.referrer || ''
+                })
+            });
+            const data = await response.json();
+            if (!response.ok || !data.success) {
+                throw new Error(data.message || 'track visit failed');
+            }
+            return data;
+        }
+
+        async function submitFeedback(payload) {
+            const response = await fetch('/kitserver/submit_feedback', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify(payload)
+            });
+            const data = await response.json();
+            if (!response.ok || !data.success) {
+                throw new Error(data.message || 'submit feedback failed');
+            }
+            return data;
+        }
+
+        function waitForVisitorRegistration() {
+            openVisitorModal();
+
+            return new Promise((resolve) => {
+                const handleSubmit = async (event) => {
+                    event.preventDefault();
+
+                    const institution = visitorInstitution.value.trim();
+                    const lab_name = visitorLabName.value.trim();
+                    const person_name = visitorPersonName.value.trim();
+
+                    if (!institution || !lab_name || !person_name) {
+                        setVisitorMessage(t('visitor.required'), true);
+                        return;
+                    }
+
+                    visitorSubmitBtn.disabled = true;
+                    setVisitorMessage(t('visitor.saving'));
+
+                    try {
+                        const result = await registerVisitor({ institution, lab_name, person_name });
+                        if (!result.success) {
+                            throw new Error(result.message || 'register visitor failed');
+                        }
+                        closeVisitorModal();
+                        visitorForm.removeEventListener('submit', handleSubmit);
+                        resolve(result);
+                    } catch (error) {
+                        setVisitorMessage(t('visitor.registerFailed', { msg: error.message }), true);
+                    } finally {
+                        visitorSubmitBtn.disabled = false;
+                    }
+                };
+
+                visitorForm.addEventListener('submit', handleSubmit);
+            });
+        }
+
+        async function ensureVisitorReady() {
+            const existingVisitorId = getVisitorId();
+            if (!existingVisitorId) {
+                await waitForVisitorRegistration();
+            }
+
+            try {
+                await trackVisit(window.location.pathname);
+            } catch (error) {
+                taskStatus.textContent = t('visitor.trackFailed', { msg: error.message });
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            langZh.addEventListener('click', () => setLanguage('zh'));
+            langEn.addEventListener('click', () => setLanguage('en'));
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.addEventListener('click', function () {
+                    document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    currentCategory = this.getAttribute('data-category');
+                    renderCards();
+                });
+            });
+
+            document.querySelectorAll('.type-tab').forEach(tab => {
+                tab.addEventListener('click', function () {
+                    document.querySelectorAll('.type-tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    currentType = this.getAttribute('data-type');
+                    renderCards();
+                });
+            });
+
+            assembleBtn.addEventListener('click', function () {
+                if (selectedComponents.length >= 2) {
+                    startAssembly();
+                }
+            });
+            feedbackForm.addEventListener('submit', async function (event) {
+                event.preventDefault();
+                const title = feedbackTitle.value.trim();
+                const content = feedbackContent.value.trim();
+
+                if (!title || !content) {
+                    setFeedbackMessage(t('feedback.required'), true);
+                    return;
+                }
+
+                feedbackSubmitBtn.disabled = true;
+                setFeedbackMessage(t('feedback.sending'));
+
+                try {
+                    await submitFeedback({
+                        visitor_id: getVisitorId(),
+                        feedback_type: feedbackType.value,
+                        title,
+                        content,
+                        contact_email: feedbackContact.value.trim(),
+                        page_path: window.location.pathname
+                    });
+                    feedbackForm.reset();
+                    setFeedbackMessage(t('feedback.success'));
+                } catch (error) {
+                    setFeedbackMessage(t('feedback.failed', { msg: error.message }), true);
+                } finally {
+                    feedbackSubmitBtn.disabled = false;
+                }
+            });
+            successfulPlans = loadSuccessfulPlans();
+            setLanguage(currentLang);
+            try {
+                await ensureVisitorReady();
+            } catch (error) {
+                taskStatus.textContent = t('visitor.registerFailed', { msg: error.message });
+                return;
+            }
+            await fetchData();
+            updateSelectedList();
+        });
+
+        async function requestInitData(category, type) {
+            const response = await fetch(`/kitserver/initdata?currentCategory=${category}&currentType=${type}`);
+            const data = await response.json();
+            if (!data.success && data.next_url) {
+                const presentUrl = window.location.href;
+                window.location.href = `${data.next_url}?next=${encodeURIComponent(presentUrl)}`;
+                return [];
+            }
+            if (!data.success) {
+                taskStatus.textContent = data.message
+                    ? t('task.running', { status: data.message })
+                    : t('task.initdataFailed');
+                return [];
+            }
+            return data.data || [];
+        }
+
+        async function fetchData() {
+            try {
+                const [
+                    ePart, eBackbone, ePlasmid,
+                    yPart, yBackbone, yPlasmid
+                ] = await Promise.all([
+                    requestInitData('ecoli', 'part'),
+                    requestInitData('ecoli', 'backbone'),
+                    requestInitData('ecoli', 'plasmid'),
+                    requestInitData('yeast', 'part'),
+                    requestInitData('yeast', 'backbone'),
+                    requestInitData('yeast', 'plasmid')
+                ]);
+
+                componentEcoliPartList = ePart;
+                componentEcoliBackboneList = eBackbone;
+                componentEcoliPlasmidList = ePlasmid;
+                componentYeastPartList = yPart;
+                componentYeastBackboneList = yBackbone;
+                componentYeastPlasmidList = yPlasmid;
+
+                const totalLoaded =
+                    ePart.length + eBackbone.length + ePlasmid.length +
+                    yPart.length + yBackbone.length + yPlasmid.length;
+                updateTopHints(totalLoaded);
+
+                renderCards();
+            } catch (error) {
+                cardsGrid.innerHTML = `<div class="no-items">${t('cards.loadFailed')}</div>`;
+                taskStatus.textContent = t('task.running', { status: error.message });
+            }
+        }
+
+        function getCurrentList() {
+            return listMap[currentCategory][currentType]();
+        }
+
+        function renderCards() {
+            cardsGrid.innerHTML = '';
+            libraryTag.textContent = `${currentCategory} / ${currentType}`;
+
+            const list = getCurrentList();
+            const available = list.filter(item => item.status);
+            cardsSummary.textContent = t('cards.available', { count: available.length });
+
+            if (available.length === 0) {
+                cardsGrid.innerHTML = `<div class="no-items">${t('cards.empty')}</div>`;
+                return;
+            }
+
+            available.forEach(component => {
+                const key = componentKey(component.name, currentCategory, currentType);
+                const isSelected = selectedComponents.some(c => c.key === key);
+                const tag = currentType === 'part'
+                    ? (component.type || 'part').toUpperCase()
+                    : currentType.toUpperCase();
+
+                const rows = [];
+                rows.push(`<div class="meta-item"><b>${t('card.name')}:</b>${component.name}</div>`);
+                rows.push(`<div class="meta-item"><b>${t('card.length')}:</b>${normalizeText(component.length)}</div>`);
+                if (component.type) rows.push(`<div class="meta-item"><b>${t('card.type')}:</b>${component.type}</div>`);
+                if (component.part) rows.push(`<div class="meta-item"><b>${t('card.part')}:</b>${component.part}</div>`);
+                if (component.marker) rows.push(`<div class="meta-item"><b>${t('card.marker')}:</b>${normalizeText(component.marker)}</div>`);
+                if (component.ori) rows.push(`<div class="meta-item"><b>${t('card.ori')}:</b>${normalizeText(component.ori)}</div>`);
+                if (component.scar) {
+                    const scarKeys = [
+                        ["bbsi", t("card.scar_bbsi")],
+                        ["bsai", t("card.scar_bsai")],
+                    ];
+                    scarKeys.forEach(([key, label]) => {
+                        if (component.scar[key] !== undefined && component.scar[key] !== null) {
+                            rows.push(`<div class="meta-item"><b>${label}:</b>${normalizeText(component.scar[key])}</div>`);
+                        }
+                    });
+                }
+                if (component.user) rows.push(`<div class="meta-item"><b>${t('card.user')}:</b>${component.user}</div>`);
+
+                const card = document.createElement('div');
+                card.className = `card ${isSelected ? 'selected' : ''}`;
+                card.innerHTML = `
+                    <div class="card-head">
+                        <div class="card-name">${component.name}</div>
+                        <span class="badge">${tag}</span>
+                    </div>
+                    <div class="meta">${rows.join('')}</div>
+                    <button
+                        class="select-btn ${isSelected ? 'selected' : ''}"
+                        data-key="${key}"
+                        data-id="${component.name}"
+                        data-category="${currentCategory}"
+                        data-type="${currentType}">
+                        ${isSelected ? `<i class="fa-solid fa-check"></i> ${t('select.selected')}` : `<i class="fa-solid fa-plus"></i> ${t('select.choose')}`}
+                    </button>
+                `;
+                cardsGrid.appendChild(card);
+            });
+
+            document.querySelectorAll('.select-btn').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    toggleComponentSelection(
+                        this.getAttribute('data-key'),
+                        this.getAttribute('data-id'),
+                        this.getAttribute('data-category'),
+                        this.getAttribute('data-type')
+                    );
+                });
+            });
+        }
+
+        function toggleComponentSelection(key, name, category, type) {
+            const index = selectedComponents.findIndex(c => c.key === key);
+            if (index === -1) {
+                selectedComponents.push({ key, name, category, type });
+            } else {
+                selectedComponents.splice(index, 1);
+            }
+
+            assembleBtn.disabled = selectedComponents.length < 2;
+            updateSelectedList();
+            renderCards();
+            renderSuccessfulPlans();
+        }
+
+        function updateSelectedList() {
+            selectedCount.textContent = selectedComponents.length;
+            selectedList.innerHTML = '';
+
+            if (selectedComponents.length === 0) {
+                selectedList.innerHTML = `<li class="no-items">${t('selection.noItems')}</li>`;
+                return;
+            }
+
+            selectedComponents.forEach(component => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <div>
+                        <div class="selected-name">${component.name}</div>
+                        <div class="selected-sub">${component.category} | ${component.type}</div>
+                    </div>
+                    <button class="remove-btn" data-key="${component.key}" title="${t('remove.title')}">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                `;
+                selectedList.appendChild(li);
+            });
+
+            document.querySelectorAll('.remove-btn').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const key = this.getAttribute('data-key');
+                    const target = selectedComponents.find(c => c.key === key);
+                    if (!target) return;
+                    toggleComponentSelection(target.key, target.name, target.category, target.type);
+                });
+            });
+        }
+
+        function renderSuccessfulPlans() {
+            successfulPlansList.innerHTML = '';
+
+            if (successfulPlans.length === 0) {
+                successfulPlansList.innerHTML = `<div class="no-items">${t('selection.noCachedPlans')}</div>`;
+                return;
+            }
+
+            successfulPlans.forEach(planName => {
+                const key = componentKey(planName, 'cache', 'plasmid');
+                const isSelected = selectedComponents.some(component => component.key === key);
+                const button = document.createElement('button');
+                button.className = `cache-plan-btn ${isSelected ? 'selected' : ''}`;
+                button.type = 'button';
+                button.textContent = planName;
+                button.setAttribute('data-plan-name', planName);
+                button.addEventListener('click', function () {
+                    addSuccessfulPlanToSelection(planName);
+                });
+                successfulPlansList.appendChild(button);
+            });
+        }
+
+        function addSuccessfulPlanToSelection(planName) {
+            const key = componentKey(planName, 'cache', 'plasmid');
+            const exists = selectedComponents.some(component => component.key === key);
+            if (exists) {
+                return;
+            }
+
+            selectedComponents.push({
+                key,
+                name: planName,
+                category: 'cache',
+                type: 'plasmid'
+            });
+            assembleBtn.disabled = selectedComponents.length < 2;
+            updateSelectedList();
+            renderCards();
+            renderSuccessfulPlans();
+        }
+
+        function cacheSuccessfulPlan(planName) {
+            if (!planName) {
+                return;
+            }
+
+            successfulPlans = [planName, ...successfulPlans.filter(name => name !== planName)].slice(0, 12);
+            saveSuccessfulPlans();
+            renderSuccessfulPlans();
+        }
+
+        async function startAssembly() {
+            taskStatus.textContent = t('task.submitting');
+
+            const partList = [];
+            const backboneList = [];
+            const plasmidList = [];
+
+            selectedComponents.forEach(component => {
+                if (component.type === 'part') partList.push(component.name);
+                if (component.type === 'backbone') backboneList.push(component.name);
+                if (component.type === 'plasmid') plasmidList.push(component.name);
+            });
+
+            try {
+                const assemblyResult = await fetch('/kitserver/assembly', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify({
+                        part: partList,
+                        backbone: backboneList,
+                        plasmid: plasmidList
+                    })
+                });
+                const result = await assemblyResult.json();
+
+                if (result.task_id) {
+                    taskStatus.textContent = t('task.queued', { id: result.task_id });
+                    pollAssemblyTaskStatus(result.task_id, result.name);
+                } else {
+                    displayResult(result);
+                }
+            } catch (error) {
+                displayError(t('msg.submitFailed', { msg: error.message }));
+            }
+        }
+
+        function pollAssemblyTaskStatus(taskId, name) {
+            taskStatus.textContent = t('task.polling', { id: taskId });
+            const pollInterval = setInterval(async () => {
+                try {
+                    const response = await fetch(`/kitserver/task_status/${taskId}`);
+                    const result = await response.json();
+                    console.log(result);
+
+                    if (result.status === 'completed') {
+                        clearInterval(pollInterval);
+                        taskStatus.textContent = t('task.completedDownloading');
+                        displayResult({ ...result, name });
+                        window.location.href = `/kitserver/getAssembly/${taskId}/${name}`;
+                    } else if (result.status === 'failed') {
+                        clearInterval(pollInterval);
+                        taskStatus.textContent = t('task.failed');
+                        displayError(result.error || t('msg.assemblyFailed'));
+                    } else {
+                        taskStatus.textContent = t('task.running', { status: result.status || 'running' });
+                    }
+                } catch (error) {
+                    clearInterval(pollInterval);
+                    taskStatus.textContent = t('task.pollingError');
+                    displayError(t('msg.pollFailed', { msg: error.message }));
+                }
+            }, 2000);
+        }
+
+        function displayResult(result) {
+            if (result.status === 'completed') {
+                const message = result.message || t('msg.assemblyCompleted');
+                cacheSuccessfulPlan(result.name);
+                taskStatus.textContent = t('task.completed');
+                alert(message);
+                return;
+            }
+            taskStatus.textContent = t('task.failed');
+            alert(t('msg.processFailed', { msg: result.message || 'unknown error' }));
+        }
+
+        function displayError(message) {
+            alert(message);
+        }
+    </script>
+</body>
+</html>

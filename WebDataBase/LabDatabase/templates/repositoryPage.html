@@ -1,0 +1,133 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <title>组装仓库信息管理</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'LabDatabase/css/repositoryPage.css' %}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-dna"></i> 组装仓库信息管理系统</h1>
+            <p class="subtitle">查看和组装生物元件，生成质粒结构图</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="info-section">
+                <div class="info-card">
+                    <h2 class="card-title"><i class="fas fa-info-circle"></i> 仓库基本信息</h2>
+                    
+                    <div class="info-row">
+                        <div class="info-label">创建者：</div>
+                        <div class="info-value">{{repository.user}}</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">仓库名称：</div>
+                        <div class="info-value" id="repositoryName">{{repository.name}}</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">创建日期：</div>
+                        <div class="info-value">{{repository.created_time}}</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">过期日期：</div>
+                        <div class="info-value">
+                            <span id="expiry-date">{{repository.expired_time}}</span>
+                            <span id="expiry-status" class="valid">{{repository.is_actived}}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="info-card">
+                    <h2 class="card-title"><i class="fas fa-cubes"></i> 仓库内容</h2>
+                    
+                    <div class="components-section">
+                        <h3 style="color: #555; margin-bottom: 15px;">元件 ({{repository.part_number}})</h3>
+                        {% if repository.parts %}
+                            {% for part in repository.parts%}
+                                <div class="component-item">
+                                    <div class="component-name">{{part.name}}</div>
+                                    <div class="component-details">
+                                        <span>类型:{{part.Type}}</span>
+                                        <span>Scar:{{part.scar}}</span>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    
+                    <div class="components-section" style="margin-top: 25px;">
+                        <h3 style="color: #555; margin-bottom: 15px;">载体信息</h3>
+                        {% if repository.backbones %}
+                            {% for backbone in repository.backbones %}
+                                <div class="component-item">
+                                    <div class="component-name">{{backbone.name}}</div>
+                                    <div class="component-details">
+                                        <span>Ori:{{backbone.ori}}</span>
+                                        <span>Marker:{{backbone.marker}}</span>
+                                        <span>Scar:{{backbone.scar}}</span>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    
+                    <div class="components-section" style="margin-top: 25px;">
+                        <h3 style="color: #555; margin-bottom: 15px;">质粒信息 ({{repository.plasmid_number}})</h3>
+                        {% if repository.plasmids %}
+                            {% for plasmid in repository.plasmids %}
+                                <div class="component-item">
+                                    <div class="component-name">{{plasmid.name}}</div>
+                                    <div class="component-details">
+                                        <span>长度：{{plasmid.length}}</span>
+                                        <span>Scar: {{plasmid.scar}}</span>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="diagram-section">
+                <div class="diagram-container">
+                    <h2 class="diagram-title"><i class="fas fa-project-diagram"></i> 组装示意图</h2>
+                    <div class="diagram-box" id="diagram-box">
+                        <div class="diagram-placeholder" id="diagram-placeholder">
+                            <i class="fas fa-dna"></i>
+                            <p>示意图将在组装后生成</p>
+                            <p style="font-size: 0.9rem; margin-top: 5px;">点击"开始组装"按钮生成质粒结构图</p>
+                        </div>
+                        <img src="" alt="质粒示意图" class="diagram-image" id="diagram-image">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="action-section">
+            <button class="assemble-btn" id="assemble-btn">
+                <i class="fas fa-cogs"></i>
+                <span id="btn-text">开始组装</span>
+                <div class="loading" id="loading-spinner">
+                    <i class="fas fa-spinner fa-spin"></i>
+                </div>
+            </button>
+        </div>
+        
+        <div class="footer">
+            <p>组装仓库信息管理系统 &copy; 2023 | 生物信息学实验室</p>
+            <p style="font-size: 0.8rem; margin-top: 5px;">本页面用于展示组装仓库信息及执行组装操作</p>
+        </div>
+    </div>
+    
+
+    <script src="{% static 'LabDatabase/js/repositoryPage.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+from rest_framework import serializers
+from models import Backbonetable,Parentplasmidtable,Partrputable,Parttable,Plasmidneed,Straintable,TbBackboneUserfileaddress,TbPartUserfileaddress,TbPlasmidUserfileaddress,Testdatatable
+
+class StraintableSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Straintable
+        fields = '__all__'
+
+class BackbonetableSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Backbonetable
+        fields = '__all__'
+
+class ParentplasmidtableSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Parentplasmidtable
+        fields = '__all__'
+
+class PartrputableSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Partrputable
+        fields = '__all__'
+
+class ParttableSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Parttable
+        fields = '__all__'
+
+class PlasmidneedSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Plasmidneed
+        fields = '__all__'
+
+class TbBackboneUserfileaddressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TbBackboneUserfileaddress
+        fields = '__all__'
+
+class TbPartUserfileaddressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TbPartUserfileaddress
+        fields = '__all__'
+
+class TbPlasmidUserfileaddressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TbPlasmidUserfileaddress
+        fields = '__all__'
+
+class TestdatatableSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Testdatatable
+        fields = '__all__'

@@ -1,0 +1,117 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <title>基因元件信息</title>
+    <link rel="stylesheet" href="{% static 'LabDatabase/css/part.css' %}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>基因元件信息</h1>
+            <div class="gene-id">元件ID: {{part.partid}}</div>
+            <div class = "gene-id">最后更新时间：{{part.updatedate}}</div>
+        </header>
+        
+        <div class="content">
+            <div class="info-section">
+                <h2><i>📋</i> 基本信息</h2>
+                <h3><i class="fa-solid fa-user-secret"></i>  {{part.user}}</h3>
+                <div class="gene-name" id="gene-name-div">{{part.name}}({{part.alias}})</div>
+                
+                <div class="info-grid">
+                    <div class="info-card">
+                        <h3>元件类型</h3>
+                        <p>{{part.type}}</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>物种来源</h3>
+                        <p>{{part.sourceorganism}}</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>元件大小</h3>
+                        <p>{{part.lengthinlevel0}} bp</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>备注</h3>
+                        <p>{{part.note}}</p>
+                    </div>
+                    <!-- <div class="info-card">
+                        <h3>分子量</h3>
+                        <p>约26.9 kDa</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>应用领域</h3>
+                        <p>分子生物学、细胞生物学、生物技术</p>
+                    </div> -->
+                </div>
+            </div>
+            
+            <div class="info-section">
+                <h2><i>🧬</i> 元件序列</h2>
+                <p>以下是{{part.name}}基因的DNA编码序列：</p>
+                <div class="sequence-container">
+                    <div class="sequence" id="SequenceContainer">
+                        {% if part.type == "Promoter" %}
+                        <span class="StartScar">GTGC</span>
+                        {% endif %}
+                        {% if part.type == "CDS" %}
+                        <span class="StartScar">AATG</span>
+                        {% endif %}
+                        {% if part.type == "RBS" %}
+                        <span class="StartScar">ATCA</span>
+                        {% endif %}
+                        {% if part.type == "Terminator" %}
+                        <span class="StartScar">TAAA</span>
+                        {% endif %}
+                        {% if part.type == "P+R" %}
+                        <span class="StartScar">GTGC</span>
+                        {% endif %}
+                        {{part.level0sequence}}
+                        {% if part.type == "Promoter" %}
+                        <span class="EndScar">ATCA</span>
+                        {% endif %}
+                        {% if part.type == "CDS" %}
+                        <span class="EndScar">TAAA</span>
+                        {% endif %}
+                        {% if part.type == "RBS" %}
+                        <span class="EndScar">AATG</span>
+                        {% endif %}
+                        {% if part.type == "Terminator" %}
+                        <span class="EndScar">CCTC</span>
+                        {% endif %}
+                        {% if part.type == "P+R" %}
+                        <span class="EndScar">AATG</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="info-section">
+                <h2><i>📚</i> 参考文献</h2>
+                <ul class="reference-list">
+                    <li class="reference-item">
+                        <div class="reference-title">{{part.reference}}</div>
+                    </li>
+                </ul>
+            </div>
+            <div class="download-section">
+                <button class="btn" id="downPartMapButton"><i>📥</i>下载质粒图谱</button>
+                <button class="btn"><i>🧬</i> 下载序列文件</button>
+                <button class="btn"><i>📋</i> 下载详细说明</button>
+                <button class="btn" id="getExperienceData"><i class="fa-solid fa-circle-info"></i>查看测试数据</button>
+            </div>
+        </div>
+
+        <footer>
+            <p>基因元件数据库 &copy; 2025 | 最后更新: 2025年12月15日</p>
+        </footer>
+    </div>
+
+    <script src="{% static 'LabDatabase/js/part.js' %}"></script>
+</body>
+</html>

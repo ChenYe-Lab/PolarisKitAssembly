@@ -1,0 +1,298 @@
+openapi: 3.0.0
+info:
+  title: Lab DNA Data page
+  description: This is a API module for database search page.
+  version: 1.0.0
+
+servers:
+  - url: 'http://10.30.76.2:8000/LabDatabase'
+paths:
+  /index:
+    get:
+      summary: show main web page
+  /getdata:
+    get:
+      summary: List one page value of type with page value ( use webdatabase api Part/Backbone/Plasmid )
+      operationId: getData
+      parameters:
+        - name: type
+          required: true
+          in: query
+          description: data type (part\backbone\plasmid)
+          schema:
+            type: integer
+        - name: page
+          required: true
+          in: query
+          description: page number (default 1)
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Get data list
+          content:
+            application/json:
+              success:
+                type: boolean_values
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PartSimple'
+              pagination:
+                properties:
+                  current_page:
+                    type: integer
+                  total_pages:
+                    type: integer
+                  total_count:
+                    type: integer
+                  has_next:
+                    type: boolean_values
+                  has_previous:
+                    type: boolean_values
+                  page_size:
+                    type: integer
+                  offset:
+                    type: integer
+        '400':
+          description: search error
+          content:
+            text/plain:
+              schema:
+                type: string
+  /filterdata:
+    post:
+      summary: search data by filter info (use webdatabase api PartFilter)
+      operationId: DataFilter
+      requestBody:
+        content:
+          description: part
+          application/json:
+            schema:
+              properties:
+                SearchType:
+                  type: string
+                page:
+                  type: integet
+                type:
+                  type: integer
+                Enzyme:
+                  type: string
+                Scar:
+                  type: string
+                name:
+                  type: string
+                Ori:
+                  type: string
+                marker:
+                  type: string
+                Oriclone:
+                  type: string
+                MarkerClone:
+                  type: string
+                OriHost:
+                  type: string
+                MarkerHost:
+                  type: string
+      responses:
+        '200':
+          description: Get Part Data list
+          content:
+            application/json:
+              success:
+                type: boolean_values
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PartSimple'
+              pagination:
+                properties:
+                  current_page:
+                    type: integer
+                  total_pages:
+                    type: integer
+                  total_count:
+                    type: integer
+                  has_next:
+                    type: boolean_values
+                  has_previous:
+                    type: boolean_values
+                  page_size:
+                    type: integer
+                  offset:
+                    type: integer
+        '200/1':
+          description: Get Backbone Data list
+          content:
+            application/json:
+              success:
+                type: boolean_values
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BackboneSimple'
+              pagination:
+                properties:
+                  current_page:
+                    type: integer
+                  total_pages:
+                    type: integer
+                  total_count:
+                    type: integer
+                  has_next:
+                    type: boolean_values
+                  has_previous:
+                    type: boolean_values
+                  page_size:
+                    type: integer
+                  offset:
+                    type: integer
+        '200/2':
+          description: Get Backbone Data list
+          content:
+            application/json:
+              success:
+                type: boolean_values
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PlasmidSimple'
+              pagination:
+                properties:
+                  current_page:
+                    type: integer
+                  total_pages:
+                    type: integer
+                  total_count:
+                    type: integer
+                  has_next:
+                    type: boolean_values
+                  has_previous:
+                    type: boolean_values
+                  page_size:
+                    type: integer
+                  offset:
+                    type: integer
+        '400':
+          description: search error
+          content:
+            text/plain:
+              schema:
+                type: string
+  /UploadPartMap:
+    get:
+  /UploadBackboneMap:
+    get:
+  /UploadPlasmidMap:
+    get:
+  /UploadFile:
+    get:
+      summary: get upload excel file and analysis file
+      operationId: UploadFile
+      parameters:
+        - name: file
+          required: true
+      responses:
+        '200':
+          description: upload data successfully
+          content:
+            application/json:
+              type: object
+              properties:
+                success:
+                  type: boolean_values
+        '400':
+          description: upload data failly
+          content:
+            application/json:
+              type: object
+              properties:
+                success:
+                  type: boolean_values
+                message:
+                  type: string
+  /part/<int:partid>:
+    get:
+      summary: show part detail information page (use webdatabase api PartByID)
+      operationId: part_detail_show
+      parameters:
+        - name: partid
+          required: true
+          in: head
+          description: part id
+          schema:
+            type: integer
+  /backbone/<int:backboneid>:
+    get:
+      summary: show backbone detail information page (use webdatabase api BackboneByID)
+      operationId: backbone_detail_show
+      parameters:
+        - name: backboneid
+          required: true
+          in: head
+          description: backbone id
+          schema:
+            type: integer
+  /plasmid/<int:plasmidid>:
+    get:
+      summary: show backbone detail information page (use webdatabase api PlasmidByID,GetPartParent,GetBackboneParent,GetPlasmidParent,GetPlasmidSon)
+      operationId: plasmid_detail_show
+      parameters:
+        - name: partid
+          required: true
+          in: head
+          description: part id
+          schema:
+            type: integer
+  /download/<str:type>:
+    get:
+      summary: download the data template file
+      operationId: download_template
+      responses:
+        type: FileResponse
+    
+components:
+  schemas:
+    PartSimple:
+      type: object
+      properties:
+        partid:
+          type: integer
+        name:
+          type: string
+        type:
+          type: integer
+        sourceorganism:
+          type: string
+        reference:
+          type: string
+    
+    BackboneSimple:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        ori:
+          type: string
+        marker:
+          type: string
+        species:
+          type: string
+
+    PlasmidSimple:
+      type: object
+      properties:
+        plasmidid:
+          type: integer
+        name:
+          type: string
+        oricloning:
+          type: string
+        orihost:
+          type: string
+        markercloning:
+          type: string
+        markerhost:
+          type: string

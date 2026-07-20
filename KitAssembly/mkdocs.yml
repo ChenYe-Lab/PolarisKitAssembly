@@ -1,0 +1,25 @@
+site_name: KitAssembly 文档站点
+site_description: KitAssembly 自动化组装工具中文技术文档
+site_url: ""
+repo_name: KitAssembly
+
+theme:
+  name: readthedocs
+  language: zh
+
+nav:
+  - API 文档: api.md
+  - 首页: index.md
+  - KitAssembly:
+      - 工具概述: kitassembly/overview.md
+      - 核心优势: kitassembly/advantages.md
+      - 快速上手: kitassembly/quickstart.md
+      - 入口与教程: kitassembly/resources.md
+      - 组委会寄语: kitassembly/message.md
+
+markdown_extensions:
+  - toc:
+      permalink: true
+  - tables
+  - admonition
+  - attr_list
