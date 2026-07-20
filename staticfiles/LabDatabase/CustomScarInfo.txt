@@ -1,1 +1,0 @@
-{"scar_name": "test", "scar_sequence": "AAAA", "scar_description": "test", "created_by": "root", "created_at": "2026-04-28T07:32:46.217793+00:00"}
