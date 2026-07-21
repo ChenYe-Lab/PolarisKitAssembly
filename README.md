@@ -48,3 +48,90 @@ All API endpoints are versioned and documented for easy integration.
    ```bash
    git clone https://github.com/your-username/PolarisKitAssembly.git
    cd PolarisKitAssembly
+   ```
+
+2. Set up environment variables:
+   - Copy the example environment file:
+     ```bash
+     cp .env.example .env
+     ```
+   - Edit `.env` and fill in your secrets and database credentials (see comments inside the file).
+
+3. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. Run database migrations for both projects:
+   ```bash
+   python manage.py migrate --settings=WebDataBase.settings
+   python manage.py migrate --settings=KitAssembly.settings
+   ```
+
+5. (Optional) Load initial component data using the provided fixtures.
+
+### Running the Servers
+
+- **For WebDataBase** (API server):
+  ```bash
+  python manage.py runserver --settings=WebDataBase.settings 8001
+  ```
+- **For KitAssembly** (web interface):
+  ```bash
+  python manage.py runserver --settings=KitAssembly.settings 8000
+  ```
+
+> **Note**: The two projects can run independently, but KitAssembly relies on WebDataBase APIs. Ensure that WebDataBase is reachable (adjust `API_BASE_URL` in `.env` if needed).
+
+---
+
+## Configuration
+
+All sensitive and environment‑specific settings are stored in the `.env` file. Please refer to `.env.example` for the full list of required variables, including:
+
+- Database connection strings
+- Secret keys
+- API endpoints
+- Debug mode flags
+
+---
+
+## Usage Example
+
+1. Open `http://localhost:8000` in your browser.
+2. Browse the component library and select:
+   - A promoter
+   - A coding sequence (CDS)
+   - A terminator
+   - A vector (e.g., pUC19)
+3. Click **"Assemble"**.
+4. Wait a moment – the backend will check compatibility and return a visual plasmid map showing the assembled circuit.
+
+---
+
+## Technologies
+
+- **Django** & **Django REST Framework** – Backend APIs and web UI.
+- **PostgreSQL** – Primary database.
+- **Celery** (optional) – For asynchronous assembly tasks.
+- **BioPython** – For sequence manipulation and validation.
+- **Matplotlib / DNAplotlib** – For generating circuit diagrams.
+
+---
+
+## Contributing
+
+Contributions are welcome! Please open an issue or submit a pull request with your improvements. Make sure to follow the coding style and include appropriate tests.
+
+---
+
+## License
+
+This project is licensed under the **GNU General Public License v3.0** – see the [LICENSE](LICENSE) file for details.
+
+
+---
+
+## Contact
+
+For questions or support, please contact the Polaris team at [polaris@example.com](mailto:polaris@example.com) or open an issue on GitHub.
