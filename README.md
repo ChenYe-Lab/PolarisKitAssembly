@@ -1,6 +1,8 @@
 # Polaris Kit Assembly
 
 *A gene circuit automated design platform based on a component database.*
+![Static Badge](https://img.shields.io/badge/License-GPL%203.0-blue) ![Static Badge](https://img.shields.io/badge/PolarisKitAssembly-orange?logo=github)
+
 
 ---
 
