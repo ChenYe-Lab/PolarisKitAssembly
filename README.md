@@ -48,7 +48,7 @@ All API endpoints are versioned and documented for easy integration.
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/PolarisKitAssembly.git
+   git clone https://github.com/ChenYe-Lab/PolarisKitAssembly.git
    cd PolarisKitAssembly
    ```
 
@@ -133,8 +133,3 @@ Contributions are welcome! Please open an issue or submit a pull request with yo
 This project is licensed under the **GNU General Public License v3.0** – see the [LICENSE](LICENSE) file for details.
 
 
----
-
-## Contact
-
-For questions or support, please contact the Polaris team at [polaris@example.com](mailto:polaris@example.com) or open an issue on GitHub.
