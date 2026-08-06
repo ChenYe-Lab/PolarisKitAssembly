@@ -125,18 +125,6 @@ All sensitive and environment‑specific settings are stored in the `.env` file.
 
 Contributions are welcome! Please open an issue or submit a pull request with your improvements. Make sure to follow the coding style and include appropriate tests.
 
----
-
-## Plasmid map archive
-
-`Kits_plasmids_map.zip` contains 240 plasmid maps used in the Polaris toolkit, organized into:
-
-- `Kits_plasmids_map/E.coli/`
-- `Kits_plasmids_map/S.cerevisiae/`
-
-The plasmid identifiers correspond to those listed in
-`Plasmids_collection_E.coli.xlsx` and
-`Plasmids_collection_S.cerevisiae.xlsx`.
 
 ---
 
