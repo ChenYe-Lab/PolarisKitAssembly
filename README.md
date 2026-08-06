@@ -127,6 +127,19 @@ Contributions are welcome! Please open an issue or submit a pull request with yo
 
 ---
 
+## Plasmid map archive
+
+`Kits_plasmids_map.zip` contains 240 plasmid maps used in the Polaris toolkit, organized into:
+
+- `Kits_plasmids_map/E.coli/`
+- `Kits_plasmids_map/S.cerevisiae/`
+
+The plasmid identifiers correspond to those listed in
+`Plasmids_collection_E.coli.xlsx` and
+`Plasmids_collection_S.cerevisiae.xlsx`.
+
+---
+
 ## License
 
 This project is licensed under the **GNU General Public License v3.0** – see the [LICENSE](LICENSE) file for details.
