@@ -132,4 +132,8 @@ Contributions are welcome! Please open an issue or submit a pull request with yo
 
 This project is licensed under the **GNU General Public License v3.0** – see the [LICENSE](LICENSE) file for details.
 
+---
 
+## Contact
+
+For database-related inquiries, please contact [synbio.db@siat.ac.cn](mailto:synbio.db@siat.ac.cn).
