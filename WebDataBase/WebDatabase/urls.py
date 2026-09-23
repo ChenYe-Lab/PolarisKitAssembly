@@ -1,4 +1,4 @@
-﻿from django.urls import path,include
+from django.urls import path,include
 from rest_framework.routers import DefaultRouter
 
 
@@ -15,7 +15,10 @@ from WebDatabase import views,account
 # router.register('PlasmidFile',TbPlasmidUserfileaddressViewSet,basename='PlasmidFile')
 # router.register('Testdatatable',TestdatatableViewSet,basename='Testdatatable')
 # router.register('Straintable',StraintableViewSet,basename='Straintable')
+from .assembly_results import save_assembly_result_view
+
 urlpatterns = [
+    path('SaveAssemblyResult', save_assembly_result_view, name='SaveAssemblyResult'),
     # path("",v),
     path("StrainName",views.SearchByStrainName,name="StrainName"),
 

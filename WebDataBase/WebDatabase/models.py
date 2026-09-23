@@ -867,6 +867,13 @@ class Backbonefeaturetable(DeduplicatingSaveMixin, models.Model):
     feature_color = models.CharField(max_length=50)
     feature_apeinfo = models.CharField(max_length=50)
 
+    strand = models.SmallIntegerField(null=True, blank=True)
+    feature_group = models.CharField(max_length=64, blank=True, default='')
+    segment_order = models.PositiveIntegerField(default=0)
+    location_operator = models.CharField(max_length=20, blank=True, default='')
+    coordinate_system = models.CharField(max_length=30, default='one_based_closed')
+    feature_metadata = models.JSONField(default=dict, blank=True)
+
     class Meta:
         managed = True
         db_table = 'BackboneFeatureTable'
@@ -882,6 +889,13 @@ class Partfeaturetable(DeduplicatingSaveMixin, models.Model):
     feature_color = models.CharField(max_length=50)
     feature_apeinfo = models.CharField(max_length=50)
 
+    strand = models.SmallIntegerField(null=True, blank=True)
+    feature_group = models.CharField(max_length=64, blank=True, default='')
+    segment_order = models.PositiveIntegerField(default=0)
+    location_operator = models.CharField(max_length=20, blank=True, default='')
+    coordinate_system = models.CharField(max_length=30, default='one_based_closed')
+    feature_metadata = models.JSONField(default=dict, blank=True)
+
     class Meta:
         managed = True
         db_table = 'PartFeatureTable'
@@ -896,6 +910,13 @@ class Plasmidfeaturetable(DeduplicatingSaveMixin, models.Model):
     feature_label = models.CharField(max_length=50)
     feature_color = models.CharField(max_length=50)
     feature_apeinfo = models.CharField(max_length=50)
+
+    strand = models.SmallIntegerField(null=True, blank=True)
+    feature_group = models.CharField(max_length=64, blank=True, default='')
+    segment_order = models.PositiveIntegerField(default=0)
+    location_operator = models.CharField(max_length=20, blank=True, default='')
+    coordinate_system = models.CharField(max_length=30, default='one_based_closed')
+    feature_metadata = models.JSONField(default=dict, blank=True)
 
     class Meta:
         managed = True

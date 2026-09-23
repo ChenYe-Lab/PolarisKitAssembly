@@ -1,0 +1,32 @@
+# Direct runtime dependencies identified from source imports and settings.
+# Django 5.2 is the candidate baseline; full application validation is pending.
+# This is not a tested lockfile. Freeze the clean environment after validation.
+# Install: python -m pip install -r requirements.txt
+
+# Django service and API code
+Django>=5.2,<5.3
+djangorestframework
+requests
+whitenoise
+python-json-logger
+pytz
+
+# Django's django.db.backends.mysql imports MySQLdb, supplied by mysqlclient.
+# PyMySQL is also imported directly by application modules.
+# The MySQL server must be installed and configured separately.
+mysqlclient
+PyMySQL
+
+# Sequence processing and assembly (transitive dependencies are resolved by pip)
+biopython
+dnacauldron
+
+# Excel processing, numerical work, and visualization
+numpy
+pandas
+openpyxl
+matplotlib
+
+# SnapGene parsing helpers used by the bundled reader
+html2text
+xmltodict

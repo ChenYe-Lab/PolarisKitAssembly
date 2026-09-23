@@ -1,4 +1,4 @@
-﻿import django.core.exceptions
+import django.core.exceptions
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect
 from django.core import serializers
@@ -3660,40 +3660,7 @@ def deleteBackboneFeature(request):
                 
                 
 def AddBackboneFeature(request, BackboneName):
-    """
-    AddBackboneFeature API view.
-
-    Args:
-        request: Django HttpRequest object.
-        BackboneName: Input parameter.
-
-    Returns:
-        JsonResponse | Any: View response or computed result.
-    """
-    if(request.method == "POST"):
-        data = json.loads(request.body)
-        start_position = data['start_position']
-        end_position = data['end_position']
-        label = data['label']
-        type = data['feature_type']
-        color = data['color']
-        ape_info = data['ape_info']
-        max_wait_time = 5
-        start_time = time.time()
-        while time.time() - start_time < max_wait_time:
-            with transaction.atomic():
-                try:
-                    backbone_obj = Backbonetable.objects.get(name = BackboneName)
-                        # backbone_obj = Backbonetable.objects.get(name = BackboneName)
-                except Backbonetable.DoesNotExist:
-                    time.sleep(0.5)
-                    continue
-                Backbonefeaturetable.objects.create(backboneid = backbone_obj, feature_start = start_position, feature_end  = end_position,
-                                            feature_type = type, feature_label = label, feature_color = color, feature_apeinfo = ape_info)
-                return JsonResponse(data={'success':True}, status = 200 , safe=False)
-        raise WebDatabaseException(f"Backbone {BackboneName} 不存在")
-    else:
-        raise WebDatabasePOSTMethodException()
+    return _add_feature(request, Backbonetable, Backbonefeaturetable, 'name', 'backbone', 'backboneid', BackboneName)
         # return JsonResponse(data={'success':False,'message':"Just POST Method"}, status = 200, safe=False)
 
 def GetBackboneFeature(request, BackboneID):
@@ -3722,18 +3689,26 @@ def GetBackboneFeature(request, BackboneID):
 
 
 def _get_feature_payload(data):
-    return {
-        "feature_start": data.get("feature_start", data.get("start_position")),
-        "feature_end": data.get("feature_end", data.get("end_position")),
-        "feature_type": data.get("feature_type"),
-        "feature_label": data.get("feature_label", data.get("label")),
-        "feature_color": data.get("feature_color", data.get("color")),
-        "feature_apeinfo": data.get("feature_apeinfo", data.get("ape_info")),
+    payload = {
+        'feature_start': data.get('feature_start', data.get('start_position')),
+        'feature_end': data.get('feature_end', data.get('end_position')),
+        'feature_type': data.get('feature_type'),
+        'feature_label': data.get('feature_label', data.get('label')),
+        'feature_color': data.get('feature_color', data.get('color')),
+        'feature_apeinfo': data.get('feature_apeinfo', data.get('ape_info')),
     }
+    for key in ('strand', 'feature_group', 'segment_order', 'location_operator',
+                'coordinate_system', 'feature_metadata'):
+        if key in data:
+            payload[key] = data[key]
+    return payload
 
 
 def _validate_feature_payload(payload, partial=False):
-    required_fields = ["feature_start", "feature_end", "feature_type", "feature_label", "feature_color", "feature_apeinfo"]
+    required_fields = ["feature_start", "feature_end", "feature_type"]
+    if not partial:
+        for field in ("feature_label", "feature_color", "feature_apeinfo"):
+            payload[field] = payload.get(field) or ""
     if payload["feature_color"] in [None, ""]:
         payload["feature_color"] = payload["feature_apeinfo"]
     if partial:
@@ -3764,7 +3739,7 @@ def _add_feature(request, parent_model, feature_model, parent_lookup, parent_id_
         
         parent_obj = parent_model.objects.get(**{parent_lookup: parent_name})
         feature_obj = feature_model.objects.create(**{parent_obj_field: parent_obj}, **payload)
-        return JsonResponse(data={"success": True, "data": list(feature_model.objects.filter(pfid=feature_obj.pfid).values())[0]}, status=200, safe=False)
+        return JsonResponse(data={"success": True, "data": list(feature_model.objects.filter(pk=feature_obj.pk).values())[0]}, status=200, safe=False)
     except parent_model.DoesNotExist:
         raise WebDatabaseNotFoundException()
         # return JsonResponse(data={"success": False, "message": f"No such {parent_id_field}"}, status=404, safe=False)

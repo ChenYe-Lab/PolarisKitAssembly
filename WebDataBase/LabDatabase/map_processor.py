@@ -43,74 +43,37 @@ def _crop_feature_payload(request_body, crop_interval, source_start=None, source
 
 
 def _save_features(session, django_request, Base_URL, name, file_type, feature_list, feature_api, crop_interval=None):
-    def _append_feature_payload(request_body, source_start=None, source_end=None):
-            try:
-                cropped_body = _crop_feature_payload(request_body, crop_interval, source_start=source_start, source_end=source_end)
-                if cropped_body is None:
-                    return
-                payload_key = (
-                    cropped_body["start_position"],
-                    cropped_body["end_position"],
-                    cropped_body["label"],
-                    cropped_body["feature_type"],
-                    cropped_body["color"],
-                    cropped_body["ape_info"],
-                )
-                # print(payload_key)
-                if payload_key in seen_payloads:
-                    return
-                seen_payloads.add(payload_key)
-                feature_payloads.append(cropped_body)
-            except Exception as exc:
-                raise exc
-    try:
-        session.get(f"{Base_URL}delete{feature_api}Feature?name={name}", cookies=django_request.COOKIES)
-        feature_payloads = []
-        seen_payloads = set()
-        if(file_type == "gb" or file_type == "gbk" or file_type == "ape" or file_type == "str"):
-            for each_feature in feature_list:
-                try:
-                    # print(each_feature.qualifiers)
-                    start_position = each_feature.location.start+1
-                    end_position = each_feature.location.end
-                    label = each_feature.qualifiers['label'][0] if "label" in each_feature.qualifiers else ""
-                    feature_type = each_feature.type
-                    color = each_feature.qualifiers['color'][0] if 'color' in each_feature.qualifiers else _extract_color_from_note(each_feature.qualifiers['note'][0]) if "note" in each_feature.qualifiers else ""
-                    ape_info = each_feature.qualifiers['ApEinfo_fwdcolor'][0] if 'ApEinfo_fwdcolor' in each_feature.qualifiers else color
-                    request_body = {"start_position":start_position,"end_position":end_position,"label":label,"feature_type":feature_type,"color":color,"ape_info":ape_info}
-                    # print(request_body)
-                    _append_feature_payload(request_body)
-                except Exception as e:
-                    continue
-        elif(file_type == "dna"):
-            for each_feature in feature_list:
-                try:
-                    start_position = each_feature['start']
-                    end_position = each_feature['end']
-                    label = each_feature['name']
-                    feature_type = each_feature['type']
-                    color = each_feature['color']
-                    ape_info = each_feature['color']
-                    request_body = {"start_position":start_position,"end_position":end_position,"label":label,"feature_type":feature_type,"color":color,"ape_info":ape_info}
-                    _append_feature_payload(
-                        request_body,
-                        source_start=each_feature['start']+1,
-                        source_end=each_feature['end'],
-                    )
-                except Exception as e:
-                    continue
-        error_info = ""
-        for request_body in feature_payloads:
-            add_feature_response = session.post(f"{Base_URL}Add{feature_api}Feature/{name}", json=request_body, cookies=django_request.COOKIES)
-            if(add_feature_response.status_code != 200):
-                print(add_feature_response.json())
-                error_info += f"Feature {request_body['label']} 添加失败"
-        if(error_info != ""):
-            raise LabDatabaseException(message = error_info)
-    except LabDatabaseException as exc:
-        raise exc
-    except Exception as exc:
-        raise exc
+    from copy import deepcopy
+    from Bio.SeqFeature import SeqFeature, SimpleLocation
+    from Bio.SeqRecord import SeqRecord
+    from .feature_records import feature_rows, apply_feature_color
+    record = SeqRecord(Seq(''), id=name)
+    for feature in feature_list:
+        if file_type == 'dna':
+            item = SeqFeature(SimpleLocation(int(feature['start']), int(feature['end']),
+                strand={'+': 1, '-': -1}.get(feature.get('strand'))),
+                type=feature['type'], qualifiers={'label': [feature.get('name', '')],
+                                                 'color': [feature.get('color', '')]})
+        else:
+            item = deepcopy(feature)
+        if item.location is None:
+            continue
+        if crop_interval is not None:
+            start, end = crop_interval
+            if any(int(p.start) < start - 1 or int(p.end) > end for p in item.location.parts):
+                continue
+            item.location = item.location - (start - 1)
+        apply_feature_color(item)
+        record.features.append(item)
+    response = session.get(f'{Base_URL}delete{feature_api}Feature?name={name}', cookies=django_request.COOKIES)
+    response.raise_for_status()
+    if not response.json().get('success'):
+        raise ValueError('Failed to replace imported features')
+    for row in feature_rows(record):
+        response = session.post(f'{Base_URL}Add{feature_api}Feature/{name}', json=row, cookies=django_request.COOKIES)
+        response.raise_for_status()
+        if not response.json().get('success'):
+            raise ValueError('Failed to save imported feature: ' + row['feature_label'])
 
 def _extract_color_from_note(note):
     if(note != None and note != ""):

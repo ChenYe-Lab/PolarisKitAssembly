@@ -1,1 +1,11 @@
-﻿# pip freeze failed in this environment. See source_fingerprint.json for details.
+# Direct runtime dependencies identified from source imports and settings.
+# Django 5.2 is the candidate baseline; full application validation is pending.
+# This is not a tested lockfile. Freeze the clean environment after validation.
+# Install: python -m pip install -r requirements.txt
+
+Django>=5.2,<5.3
+requests
+biopython
+
+# SQLite support is provided by Python; no separate pip package is needed.
+# MkDocs is only needed to rebuild documentation, not to run the web service.
