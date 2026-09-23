@@ -47,14 +47,43 @@ class AnnotationTests(unittest.TestCase):
         self.assertEqual(semantic_data(source), semantic_data(restored))
         self.assertEqual(semantic_data(source), semantic_data(read_genbank(io.StringIO(genbank_text(source)))))
 
-    def test_opposite_strands_and_container_survive(self):
+    def test_plasmid_internal_features_keep_sources_without_new_container(self):
         source = record()
         source.features = [SeqFeature(SimpleLocation(0, 100, strand), type='misc_feature',
             qualifiers={'label': [str(strand)]}) for strand in (1, -1)]
         attach_source(source, 'plasmid', SimpleNamespace(pk=9, name='L2_module', level=2))
         normalized = normalized_record(source)
-        self.assertEqual(len(normalized.features), 3)
-        self.assertEqual(sum(first(f.qualifiers, 'source_container') == 'true' for f in normalized.features), 1)
+        self.assertEqual(len(normalized.features), 2)
+        self.assertEqual({f.location.strand for f in normalized.features}, {1, -1})
+        for feature in normalized.features:
+            self.assertEqual(first(feature.qualifiers, 'source_type'), 'plasmid')
+            self.assertEqual(first(feature.qualifiers, 'source_id'), '9')
+            self.assertTrue(first(feature.qualifiers, 'source_revision'))
+            self.assertNotEqual(first(feature.qualifiers, 'source_container'), 'true')
+
+    def test_empty_plasmid_does_not_gain_features(self):
+        source = record()
+        attach_source(source, 'plasmid', SimpleNamespace(pk=9, name='L2_module', level=2))
+        self.assertEqual(source.features, [])
+
+    def test_existing_source_information_is_preserved(self):
+        source = record()
+        feature = SeqFeature(SimpleLocation(10, 30), type='CDS', qualifiers={
+            'source_type': ['part'], 'source_id': ['17'], 'source_revision': ['original']})
+        source.features = [feature]
+        attach_source(source, 'plasmid', SimpleNamespace(pk=9, name='L2_module', level=2))
+        self.assertEqual(feature.qualifiers['source_id'], ['17'])
+        self.assertEqual(feature.qualifiers['source_type'], ['part'])
+        self.assertEqual(feature.qualifiers['source_revision'], ['original'])
+
+    def test_attach_backbone_removes_only_generated_containers(self):
+        source = record()
+        source.features = [SeqFeature(SimpleLocation(0, 100), type='rep_origin'),
+            SeqFeature(SimpleLocation(0, 100), qualifiers={'source_container': ['true']}),
+            SeqFeature(SimpleLocation(0, 100), qualifiers={'indicates_part': ['true']})]
+        attach_source(source, 'backbone', SimpleNamespace(pk=1, name='vector'))
+        self.assertEqual([f.type for f in source.features], ['rep_origin'])
+        self.assertEqual(first(source.features[0].qualifiers, 'source_type'), 'backbone')
 
     def test_backbone_generated_indicator_removed_but_internal_feature_kept(self):
         backbone = record(); backbone.id = 'backbone-1'
@@ -73,7 +102,7 @@ class AnnotationTests(unittest.TestCase):
         self.assertEqual((int(source.features[0].location.start), int(source.features[0].location.end)), (9, 18))
         self.assertEqual(source.features[0].location.strand, -1)
 
-    def test_real_assembly_retains_plasmid_label_and_backbone_features(self):
+    def test_real_assembly_retains_internal_features_without_plasmid_container(self):
         from LabDatabase.GGModule.SupportGG import SupportGG
         backbone = record('GGTCTCA' + 'GCTT' + 'ACGT' * 15 + 'AATG' + 'TGAGACC')
         plasmid = record('GGTCTCA' + 'AATG' + 'ATGC' * 15 + 'GCTT' + 'TGAGACC')
@@ -93,8 +122,10 @@ class AnnotationTests(unittest.TestCase):
             result = engine.simulation.construct_records[0]
             self.assertTrue(any(f.type == 'rep_origin' for f in result.features))
             self.assertTrue(any(f.type == 'CDS' for f in result.features))
-            self.assertTrue(any(first(f.qualifiers, 'label') == 'L1_module' and
-                                first(f.qualifiers, 'source_container') == 'true' for f in result.features))
+            self.assertFalse(any(first(f.qualifiers, 'source_container') == 'true' for f in result.features))
+            cds = next(f for f in result.features if f.type == 'CDS')
+            self.assertEqual(first(cds.qualifiers, 'source_type'), 'plasmid')
+            self.assertEqual(first(cds.qualifiers, 'source_id'), '1')
             self.assertFalse(any(first(f.qualifiers, 'source') == backbone.id and
                                  first(f.qualifiers, 'indicates_part').lower() == 'true' for f in result.features))
             saved = next((Path(folder) / 'result').rglob('L2_result.gb'))

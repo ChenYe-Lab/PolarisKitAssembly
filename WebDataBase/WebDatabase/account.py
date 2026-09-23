@@ -326,11 +326,11 @@ class CustomLoginForm(AuthenticationForm):
 # @csrf_protect
 def login_view(request):
     if request.user.is_authenticated:
-        next_url = request.GET.get("next","/LabDatabase/index")
+        next_url = request.GET.get("next",reverse_lazy("lab:index"))
         print("next_url: "+next_url)
         return redirect(next_url)
     if request.method == 'POST':
-        next_url = request.GET.get("next","/LabDatabase/index")
+        next_url = request.GET.get("next",reverse_lazy("lab:index"))
         print("next_url: "+next_url)
         form = CustomLoginForm(request=request, data = request.POST)
         # print(form.errors)
@@ -362,7 +362,7 @@ def login_view(request):
             return render(request, 'Login.html', {"form":form,"next_url":next_url})
     else:
         form = CustomLoginForm(request=request)
-        next_url = request.GET.get("next","/LabDatabase/index")
+        next_url = request.GET.get("next",reverse_lazy("lab:index"))
         return render(request, 'Login.html', {"form":form,"next_url":next_url})
     
     
@@ -388,7 +388,7 @@ def register(request):
                 # send_welcome_email(user)
                 messages.success(request, f'欢迎 {user.username}！注册成功！')
                 # 重定向到首页
-                return redirect('/LabDatabase/index')
+                return redirect('lab:index')
             else:
                 return render (request, 'Register.html',{"form":form})
         else:
@@ -402,7 +402,7 @@ def logout(request):
     from django.contrib.auth import logout
     if request.user.is_authenticated:
         logout(request)
-    return redirect("/LabDatabase/login")
+    return redirect('lab:login')
 
 
 
@@ -429,7 +429,7 @@ def admin_register(request):
                 # send_welcome_email(user)
                 messages.success(request, f'欢迎 {user.username}！注册成功！')
                 # 重定向到首页
-                return redirect('/LabDatabase/index')
+                return redirect('lab:index')
             else:
                 return render (request, 'Register_admin.html',{"form":form})
         else:
@@ -464,7 +464,7 @@ def reset_password(request):
                 # send_welcome_email(user)
                 messages.success(request, f'欢迎 {user.username}！注册成功！')
                 # 重定向到首页
-                return redirect('/LabDatabase/index')
+                return redirect('lab:index')
             else:
                 return render (request, 'reset_password.html',{"form":form})
 # class LoginModelForm(forms.ModelForm):
@@ -592,13 +592,13 @@ def reset_password(request):
 #     logout(request)
 #     request.session.clear()
 #     messages.success(request, "您已成功退出登录")
-#     return redirect("/LabDatabase/login")
+#     return redirect('lab:login')
 
 
 # def user_profile(request):
 #     if not request.user.is_authenticated:
 #         messages.error(request, '请先登录')
-#         redirect("/LabDatabase/login")
+#         redirect('lab:login')
 #     return render(request, 'profile.html',{
 #         'user':request.user
 #     })
@@ -658,7 +658,7 @@ def reset_password(request):
 # def change_password(request):
 #     if not request.user.is_authenticated:
 #         messages.error(request, '请先登录')
-#         return redirect("/LabDatabase/login")
+#         return redirect('lab:login')
 #     if(request.method == "POST"):
 #         old_password = request.POST.get('old_password')
 #         new_password1 = request.POST.get('new_password1')

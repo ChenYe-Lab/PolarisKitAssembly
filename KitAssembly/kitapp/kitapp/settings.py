@@ -34,32 +34,9 @@ def _load_env_file(env_path):
 _load_env_file(BASE_DIR / ".env")
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY')
-
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = ['*']
-
-# Allow cross-origin POSTs from tunnels/reverse proxies (e.g. ngrok).
-# Can be overridden by env var:
-# CSRF_TRUSTED_ORIGINS="https://*.ngrok-free.dev,https://your-domain.com"
-_csrf_origins_env = os.getenv("CSRF_TRUSTED_ORIGINS", "")
-CSRF_TRUSTED_ORIGINS = [
-    origin.strip()
-    for origin in _csrf_origins_env.split(",")
-    if origin.strip()
-]
-if not CSRF_TRUSTED_ORIGINS:
-    CSRF_TRUSTED_ORIGINS = [
-        "https://*.ngrok-free.dev",
-        "https://*.ngrok.io",
-    ]
+# Deployment values are parsed once, after .env loading. Process variables win.
+from .environment import build_configuration
+globals().update(build_configuration(BASE_DIR, os.environ))
 
 
 # Application definition
@@ -110,7 +87,7 @@ WSGI_APPLICATION = 'kitapp.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': SQLITE_PATH,
     }
 }
 
@@ -149,30 +126,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'kitserver/static/'
+STATIC_URL = '/kitserver/static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-
-WEBDATABASE_URL = os.getenv('WEBDATABASE_URL', 'http://10.30.76.75:8080/WebDatabase/')
-LABDATABASE_URL = os.getenv('LABDATABASE_URL', 'http://10.30.76.75:8080/LabDatabase/')
-
-# Service account login settings used by kitserver to access WebDatabase/LabDatabase
-API_LOGIN_URL = os.getenv('API_LOGIN_URL', f'{WEBDATABASE_URL}login')
-API_LOGIN_USERNAME = os.getenv('API_LOGIN_USERNAME')
-API_LOGIN_PASSWORD = os.getenv('API_LOGIN_PASSWORD')
-API_LOGIN_USERNAME_FIELD = os.getenv('API_LOGIN_USERNAME_FIELD', 'username')
-API_LOGIN_PASSWORD_FIELD = os.getenv('API_LOGIN_PASSWORD_FIELD', 'password')
-API_LOGIN_NEXT = os.getenv('API_LOGIN_NEXT', '')
-API_REQUEST_TIMEOUT = int(os.getenv('API_REQUEST_TIMEOUT', '20'))
-
-VISITOR_COOKIE_NAME = os.getenv('VISITOR_COOKIE_NAME', 'kitapp_visitor_id')
-VISITOR_COOKIE_MAX_AGE = int(os.getenv('VISITOR_COOKIE_MAX_AGE', str(60 * 60 * 24 * 365)))
-VISITOR_COOKIE_SECURE = os.getenv('VISITOR_COOKIE_SECURE', 'false').lower() == 'true'
-VISITOR_COOKIE_SAMESITE = os.getenv('VISITOR_COOKIE_SAMESITE', 'Lax')
-
-TUTORIAL_ADDRESS = os.getenv('TUTORIAL_ADDRESS')
-ZIP_ADDRESS=os.getenv('ZIP_ADDRESS')

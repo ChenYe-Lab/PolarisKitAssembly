@@ -1,15 +1,15 @@
+from WebDataWorld.runtime import ServiceSession
 from Bio.SeqIO import parse, write
 from Bio.Seq import Seq
 import requests
-import sys
 import traceback
 from Bio.Restriction import BsaI,BbsI
-# sys.path.append(r"C:\Users\admin\Desktop\WebDatabaseBeta\WebDatabase\WebDataWorld\LabDatabase\CaculateModule")
+
 # from .snapgene_readersnapgene_reader import snapgene_to_dict
 from .CaculateModule import snapgene_reader
-from ControllerModule import FittingLabels
-from CaculateModule.ScarIdentify import scarPosition,scarFunction
-from LabDatabaseException import LabDatabaseException,LabDatabaseGETMethodException,LabDatabasePOSTMethodException
+from LabDatabase.ControllerModule import FittingLabels
+from LabDatabase.CaculateModule.ScarIdentify import scarPosition,scarFunction
+from LabDatabase.LabDatabaseException import LabDatabaseException,LabDatabaseGETMethodException,LabDatabasePOSTMethodException
 
 
 def _unique_nonempty_items(items):
@@ -113,7 +113,7 @@ def process_map_file(upload_map, file_name, upload_type, django_request,Base_URL
             raise LabDatabaseException(message = "上传文件种类无法处理")
         
         if(Sequence != ""):
-            session = requests.Session()
+            session = ServiceSession()
             token = django_request.COOKIES.get('csrftoken')
             session.headers.update({
                 'User-Agent':'Django-App/1.0',
@@ -319,7 +319,7 @@ def process_map_file(upload_map, file_name, upload_type, django_request,Base_URL
 
 if __name__ == "__main__":
     # import io
-    # file_address = r"C:\Users\admin\Desktop\样例数据\level3\WBY6.dna"
+
     # upload_map_temp = open(file_address)
     # upload_map_temp = upload_map_temp.decode("utf-8")
     # upload_map = io.StringIO(upload_map_temp)

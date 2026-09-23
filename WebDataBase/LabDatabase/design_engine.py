@@ -1,3 +1,6 @@
+import math
+from django.conf import settings
+from WebDatabase.part_types import PartType
 import uuid
 from typing import Dict, List, Optional
 
@@ -7,40 +10,14 @@ from django.utils import timezone
 from WebDatabase.models import Backbonetable, CustomUser, Parttable, Temporaryrepository
 
 
-PROMOTER_TYPE = 1
-CDS_TYPE = 2
-TERMINATOR_TYPE = 3
-RBS_TYPE = 4
+PROMOTER_TYPE = PartType.PROMOTER
+CDS_TYPE = PartType.CDS
+TERMINATOR_TYPE = PartType.TERMINATOR
+RBS_TYPE = PartType.RBS
 REFERENCE_STRENGTH = 20.0
 PROMOTER_STRENGTH_PRESETS = [5.0, 10.0, 20.0, 35.0, 50.0, 75.0, 100.0]
 RBS_STRENGTH_PRESETS = [2.0, 5.0, 10.0, 15.0, 25.0, 40.0, 60.0]
 TERMINATOR_STRENGTH_PRESETS = [1.0, 2.0, 4.0, 8.0, 12.0, 16.0, 20.0]
-PART_CANDIDATE_LIMIT = 20
-ASSUMED_PROMOTER_STRENGTHS = [
-    2.0, 4.0, 6.0, 8.0, 10.0,
-    12.0, 15.0, 18.0, 22.0, 26.0,
-    30.0, 35.0, 40.0, 48.0, 56.0,
-    64.0, 72.0, 82.0, 92.0, 100.0,
-]
-ASSUMED_RBS_STRENGTHS = [
-    1.0, 2.0, 3.0, 4.0, 5.0,
-    6.5, 8.0, 10.0, 12.0, 14.0,
-    16.0, 18.0, 21.0, 24.0, 28.0,
-    32.0, 37.0, 43.0, 51.0, 60.0,
-]
-ASSUMED_TERMINATOR_STRENGTHS = [
-    0.5, 1.0, 1.5, 2.0, 2.5,
-    3.0, 4.0, 5.0, 6.0, 7.0,
-    8.0, 9.0, 10.0, 11.0, 12.0,
-    13.0, 15.0, 17.0, 19.0, 20.0,
-]
-
-ASSUMED_STRENGTH_PROFILES = {
-    PROMOTER_TYPE: ASSUMED_PROMOTER_STRENGTHS,
-    RBS_TYPE: ASSUMED_RBS_STRENGTHS,
-    TERMINATOR_TYPE: ASSUMED_TERMINATOR_STRENGTHS,
-}
-
 CHASSIS_OPTIONS = [
     {"value": "ecoli", "label": "E. coli", "keywords": ["coli", "ecoli", "e. coli"]},
     {"value": "yeast", "label": "Yeast", "keywords": ["yeast", "saccharomyces"]},
@@ -59,7 +36,7 @@ def _parse_numeric(value: Optional[float]) -> Optional[float]:
         parsed = float(value)
     except (TypeError, ValueError):
         raise ValueError("强度输入必须是数值")
-    if parsed <= 0:
+    if not math.isfinite(parsed) or parsed <= 0:
         raise ValueError("强度输入必须大于 0")
     return parsed
 
@@ -86,59 +63,41 @@ def _serialize_backbone(backbone: Backbonetable) -> Dict:
     }
 
 
-def _build_strength_series(count: int, min_value: float, max_value: float) -> List[float]:
-    """Generate evenly spaced strength values for a fixed number of candidates."""
-    if count <= 1:
-        return [(min_value + max_value) / 2]
-    step = (max_value - min_value) / (count - 1)
-    return [min_value + index * step for index in range(count)]
-
-
-def _fetch_part_candidates(part_type: int, min_strength: float, max_strength: float, limit: int = PART_CANDIDATE_LIMIT) -> List[Dict]:
-    """Fetch part candidates and assign assumed strengths from a fixed 20-item profile."""
-    parts = list(
-        Parttable.objects.filter(type=part_type)
-        .exclude(level0sequence__isnull=True)
-        .exclude(level0sequence="")
-        .order_by("name")[:limit]
-    )
-    if not parts:
-        return []
-
-    assumed_strengths = ASSUMED_STRENGTH_PROFILES.get(part_type, [])
-    if assumed_strengths:
-        strengths = assumed_strengths[: len(parts)]
-    else:
-        strengths = _build_strength_series(len(parts), min_strength, max_strength)
-    return [_serialize_part(part, strength) for part, strength in zip(parts, strengths)]
+def _fetch_part_candidates(part_type: int, min_strength: float, max_strength: float, limit=None) -> List[Dict]:
+    """Use explicit strengths keyed by stable PartID, never by name/order."""
+    profiles = settings.DESIGN_CONFIG.get('part_strengths', {})
+    if not profiles:
+        raise ValueError('尚未配置元件强度：请在 DESIGN_CONFIG_FILE 中按 PartID 配置 value 和 source')
+    limit = limit or settings.DESIGN_CANDIDATE_LIMIT
+    parts = Parttable.objects.filter(type=part_type, partid__in=profiles.keys()).exclude(
+        level0sequence__isnull=True).exclude(level0sequence='').order_by('partid')
+    candidates = []
+    for part in parts:
+        profile = profiles[str(part.partid)]
+        if not isinstance(profile, dict) or not str(profile.get('source', '')).strip():
+            raise ValueError(f'PartID {part.partid} 的强度必须注明 source')
+        strength = _parse_numeric(profile.get('value'))
+        if strength is None:
+            raise ValueError(f'PartID {part.partid} 缺少强度 value')
+        candidate = _serialize_part(part, strength)
+        candidate['strength_source'] = profile['source']
+        candidates.append(candidate)
+        if len(candidates) >= limit:
+            break
+    return candidates
 
 
 def _fetch_backbone_candidates(chassis: str, limit: int = 12) -> List[Dict]:
-    """Fetch backbone candidates that best match the requested chassis keywords."""
-    # chassis_info = CHASSIS_MAP.get(chassis, CHASSIS_MAP["ecoli"])
-    # queryset = Backbonetable.objects.exclude(sequence__isnull=True).exclude(sequence="")
-    # species_filter = Q()
-    # for keyword in chassis_info["keywords"]:
-    #     species_filter |= Q(species__icontains=keyword)
-    #     species_filter |= Q(notes__icontains=keyword)
-    #     species_filter |= Q(alias__icontains=keyword)
+    chassis = (chassis or '').strip().lower()
+    if chassis not in CHASSIS_MAP:
+        raise ValueError('不支持的底盘类型')
+    target_name = settings.DESIGN_CONFIG.get('backbones', {}).get(chassis)
+    if not isinstance(target_name, str) or not target_name.strip():
+        raise ValueError(f'底盘 {chassis} 尚未配置 Backbone')
+    backbone = Backbonetable.objects.exclude(sequence__isnull=True).exclude(
+        sequence='').filter(name__iexact=target_name).first()
+    return [_serialize_backbone(backbone)] if backbone else []
 
-    # backbones = list(queryset.filter(species_filter).order_by("name")[:limit])
-    # if not backbones:
-    #     backbones = list(queryset.order_by("name")[:limit])
-    # return [_serialize_backbone(backbone) for backbone in backbones]
-
-    """Fetch the fixed backbone required by the selected chassis."""
-    target_name = "pEcBb15" if (chassis or "").lower() == "ecoli" else "pScBb04"
-    backbone = (
-        Backbonetable.objects.exclude(sequence__isnull=True)
-        .exclude(sequence="")
-        .filter(name__iexact=target_name)
-        .first()
-    )
-    if backbone is None:
-        return []
-    return [_serialize_backbone(backbone)]
 
 def _pick_nearest(candidates: List[Dict], target_strength: float) -> Optional[Dict]:
     """Select the candidate whose strength is closest to the target value."""
@@ -312,12 +271,13 @@ def create_design_repository(request, design_result: Dict) -> Temporaryrepositor
             "design_uuid": uuid.uuid4().hex,
             "inputs": design_result["inputs"],
             "strengths": design_result["strengths"],
+            "part_strengths": [{"id": item["id"], "value": item.get("strength"), "source": item.get("strength_source")} for item in design_result["selected_parts"]],
             "selected_part_names": [item["name"] for item in design_result["selected_parts"]],
             "selected_backbone_name": design_result["selected_backbone"]["name"],
         },
     }
 
-    expires_at = timezone.now() + timezone.timedelta(days=30)
+    expires_at = timezone.now() + timezone.timedelta(hours=settings.DESIGN_REPOSITORY_TTL_HOURS)
     Temporaryrepository.objects.filter(userid=user, name=repository_name).delete()
     return Temporaryrepository.objects.create(
         id=uuid.uuid4().hex,

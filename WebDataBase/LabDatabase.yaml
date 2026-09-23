@@ -5,7 +5,7 @@ info:
   version: 1.0.0
 
 servers:
-  - url: 'http://10.30.76.2:8000/LabDatabase'
+  - url: '/LabDatabase'
 paths:
   /index:
     get:

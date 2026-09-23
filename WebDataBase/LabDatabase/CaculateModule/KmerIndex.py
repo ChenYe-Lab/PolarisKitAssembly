@@ -1,9 +1,7 @@
 import numpy as np
 from collections import defaultdict
 import heapq
-import sys
 
-sys.path.append(r"C:\Users\admin\Desktop\LabDNASeqSearch")
 
 
 #由于数据库不同，所以Seq_id存储值为Seq_name

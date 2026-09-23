@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 import os
+import json
+from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -52,16 +54,12 @@ def get_list_env(name, default=None, separator=','):
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv(
-    'DJANGO_SECRET_KEY',
-    'django-insecure-p7dx^4v#lhgaz$x#$&fy2z_2_-(5e^4^jmkht+qa@!+801j)_!'
-)
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = get_bool_env('DJANGO_DEBUG', True)
-
-ALLOWED_HOSTS = get_list_env('DJANGO_ALLOWED_HOSTS', ['*'])
+# Missing deployment secrets must never fall back to a shared key.
+DEBUG = get_bool_env('DJANGO_DEBUG', False)
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', '').strip()
+if not SECRET_KEY or SECRET_KEY == 'replace-with-your-secret-key':
+    raise ImproperlyConfigured('Set DJANGO_SECRET_KEY to a unique secret')
+ALLOWED_HOSTS = get_list_env('DJANGO_ALLOWED_HOSTS', ['localhost', '127.0.0.1'])
 
 
 # Application definition
@@ -107,21 +105,10 @@ TEMPLATES = [
     },
 ]
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-SESSION_COOKIE_SECURE = get_bool_env('DJANGO_SESSION_COOKIE_SECURE', False)
-CSRF_COOKIE_SECURE = get_bool_env('DJANGO_CSRF_COOKIE_SECURE', False)
-SESSION_COOKIE_SECURE = False   # 开发环境可设为 False
-CSRF_COOKIE_SECURE = False 
-
-
-
-
+SESSION_COOKIE_SECURE = get_bool_env('DJANGO_SESSION_COOKIE_SECURE', not DEBUG)
+CSRF_COOKIE_SECURE = get_bool_env('DJANGO_CSRF_COOKIE_SECURE', not DEBUG)
 WSGI_APPLICATION = 'WebDataWorld.wsgi.application'
-CSRF_TRUSTED_ORIGINS = [
-    'https://subcalibre-adsorptively-landry.ngrok-free.dev',
-]
-SESSION_COOKIE_SECURE = get_bool_env('DJANGO_SESSION_COOKIE_SECURE', SESSION_COOKIE_SECURE)
-CSRF_COOKIE_SECURE = get_bool_env('DJANGO_CSRF_COOKIE_SECURE', CSRF_COOKIE_SECURE)
-CSRF_TRUSTED_ORIGINS = get_list_env('DJANGO_CSRF_TRUSTED_ORIGINS', CSRF_TRUSTED_ORIGINS)
+CSRF_TRUSTED_ORIGINS = get_list_env('DJANGO_CSRF_TRUSTED_ORIGINS')
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
@@ -163,7 +150,7 @@ AUTHENTICATION_BACKENDS = [
 
 AUTH_USER_MODEL = 'WebDatabase.CustomUser'
 
-LOGIN_URL = '/LabDatabase/login/'
+LOGIN_URL = 'lab:login'
 
 
 
@@ -197,7 +184,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 #media
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = Path(os.getenv('MEDIA_ROOT', BASE_DIR / 'media'))
 
 #文件上传设置
 FILE_UPLOAD_MAX_MEMORY_SIZE = 26214400  # 25MB
@@ -209,7 +196,7 @@ FILE_UPLOAD_HANDLERS = [
 
 #LOG FILE
 # 创建日志目录
-LOG_DIR = os.path.join(BASE_DIR, 'logs')
+LOG_DIR = os.getenv('LOG_DIR', str(BASE_DIR / 'logs'))
 if not os.path.exists(LOG_DIR):
     os.makedirs(LOG_DIR)
 
@@ -488,3 +475,52 @@ LOGGING_development = LogConfig.get_logging_config('development', LOG_DIR)
 
 LOGGING_production = LogConfig.get_logging_config('production', LOG_DIR)
 
+
+
+# Deployment paths and shared runtime policies.
+WEBDATABASE_API_BASE_URL = os.getenv('WEBDATABASE_API_BASE_URL', 'http://127.0.0.1:8000/WebDatabase/')
+EXPERIMENT_BASE_URL = os.getenv('EXPERIMENT_BASE_URL', '')
+ASSEMBLY_OUTPUT_DIR = Path(os.getenv('ASSEMBLY_OUTPUT_DIR', MEDIA_ROOT / 'assembly'))
+ASSEMBLY_INPUT_DIR = Path(os.getenv('ASSEMBLY_INPUT_DIR', MEDIA_ROOT / 'assembly_inputs'))
+GENERATED_FILES_DIR = Path(os.getenv('GENERATED_FILES_DIR', MEDIA_ROOT / 'generated'))
+DOWNLOAD_TEMPLATE_DIR = Path(os.getenv('DOWNLOAD_TEMPLATE_DIR', BASE_DIR / 'LabDatabase' / 'static' / 'LabDatabase' / 'DownloadFile'))
+BASIC_FEATURE_FILE = Path(os.getenv('BASIC_FEATURE_FILE', BASE_DIR / 'LabDatabase' / 'CaculateModule' / 'BasicFeature.txt'))
+CUSTOM_SCAR_FILE = Path(os.getenv('CUSTOM_SCAR_FILE', MEDIA_ROOT / 'CustomScarInfo.txt'))
+
+def positive_env(name, default, cast=int):
+    try:
+        value = cast(os.getenv(name, default))
+        if value <= 0 or not __import__('math').isfinite(value):
+            raise ValueError()
+        return value
+    except (ValueError, TypeError):
+        raise ImproperlyConfigured(f'{name} must be a positive number')
+
+SERVICE_HTTP_TIMEOUT = positive_env('SERVICE_HTTP_TIMEOUT', 30, float)
+TASK_STATUS_TTL_SECONDS = positive_env('TASK_STATUS_TTL_SECONDS', 100000)
+DB_RETRY_TIMEOUT_SECONDS = positive_env('DB_RETRY_TIMEOUT_SECONDS', 5, float)
+DB_RETRY_INTERVAL_SECONDS = positive_env('DB_RETRY_INTERVAL_SECONDS', 0.5, float)
+REPOSITORY_CREATE_TTL_HOURS = positive_env('REPOSITORY_CREATE_TTL_HOURS', 720)
+REPOSITORY_UPDATE_TTL_HOURS = positive_env('REPOSITORY_UPDATE_TTL_HOURS', 24)
+DESIGN_REPOSITORY_TTL_HOURS = positive_env('DESIGN_REPOSITORY_TTL_HOURS', 720)
+API_PAGE_SIZE = positive_env('API_PAGE_SIZE', 10)
+API_MAX_PAGE_SIZE = positive_env('API_MAX_PAGE_SIZE', 5000)
+UPLOAD_PAGE_SIZE = positive_env('UPLOAD_PAGE_SIZE', 100)
+UPLOAD_MAX_PAGE_SIZE = positive_env('UPLOAD_MAX_PAGE_SIZE', 5000)
+DESIGN_CANDIDATE_LIMIT = positive_env('DESIGN_CANDIDATE_LIMIT', 20)
+
+# Explicit, ID-bound design data; missing measurements are not invented.
+DESIGN_CONFIG_FILE = os.getenv('DESIGN_CONFIG_FILE', '')
+DESIGN_CONFIG = {'backbones': {}, 'part_strengths': {}}
+if DESIGN_CONFIG_FILE:
+    config_path = Path(DESIGN_CONFIG_FILE)
+    if not config_path.is_absolute():
+        config_path = BASE_DIR / config_path
+    try:
+        DESIGN_CONFIG = json.loads(config_path.read_text(encoding='utf-8'))
+        if not isinstance(DESIGN_CONFIG, dict):
+            raise ValueError('expected an object')
+        if not all(isinstance(DESIGN_CONFIG.get(key, {}), dict) for key in ('backbones', 'part_strengths')):
+            raise ValueError('backbones and part_strengths must be objects')
+    except (OSError, ValueError) as exc:
+        raise ImproperlyConfigured(f'Invalid DESIGN_CONFIG_FILE: {exc}') from exc

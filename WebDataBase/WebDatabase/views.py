@@ -1,3 +1,6 @@
+from django.urls import reverse
+from WebDataWorld.runtime import page_size as bounded_page_size
+from .part_types import PartType
 import django.core.exceptions
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect
@@ -128,10 +131,10 @@ def _build_upload_record_query(filter_expr):
 class User_auth(MiddlewareMixin):
     
     def process_request(self,request):
-        request.start_time = time.time()
+        request.start_time = time.monotonic()
         try:
             #鎺掗櫎涓嶉渶瑕佺櫥褰曞氨鑳借闂殑椤甸潰
-            if request.path_info == "/WebDatabase/login" or request.path_info == "/WebDatabase/register" or request.path_info == "/WebDatabase/AdminRegister" or request.path_info == "/WebDatabase/reset":
+            if request.path_info == reverse("api:login") or request.path_info == reverse("api:register") or request.path_info == reverse("api:AdminRegister") or request.path_info == reverse("api:resetpassword"):
                 return
             info = request.session.get('info')
             #temp
@@ -141,17 +144,17 @@ class User_auth(MiddlewareMixin):
             if user:
                 return
             else:
-                return redirect('/WebDatabase/login')
+                return redirect('api:login')
             # if not info:
-            #     return redirect('/WebDatabase/login')
+            #     return redirect('api:login')
             # else:
             #     return
         except Exception as e:
             return
 
     def process_response(self,request,response):
-        final_time = time.time()
-        duration_time = time.time() - request.start_time
+        final_time = time.monotonic()
+        duration_time = time.monotonic() - request.start_time
         request_logger.request_log(
             request, response, duration_time
         )
@@ -269,7 +272,7 @@ def PartDataALL(request):
                 # return JsonResponse(data="No such part", status=404,safe=False)
                 # return JsonResponse({'code':204,'status': 'failed', 'data': []})
         else:
-            page_size = int(request.GET.get('page_size',10))
+            page_size = bounded_page_size(request.GET.get('page_size'))
             offset = (page -1)*page_size
             total_count = Parttable.objects.count()
             total_pages = (total_count + page_size -1) // page_size
@@ -309,17 +312,17 @@ def PartFilter(request):
         Scar = data['Scar']
         name = data['name']
         page = data['page']
-        page_size = data['page_size']
+        page_size = bounded_page_size(data.get('page_size'))
         offset = (page - 1) * page_size
         if(type != ""):
             if(type.lower() == "promoter"):
-                type = 1
+                type=PartType.PROMOTER
             elif(type.lower() == "terminator"):
-                type = 3
+                type=PartType.TERMINATOR
             elif(type.lower() == "rbs"):
-                type = 4
+                type=PartType.RBS
             elif(type.lower() == "cds"):
-                type = 2
+                type=PartType.CDS
             elif(type.lower() == "p+r"):
                 type = 5
         scarpartid = []
@@ -643,13 +646,13 @@ def SearchByPartType(request):
             # return JsonResponse(data="Type cannot be empty", status=400,safe=False)
             # return JsonResponse({'code':204,'status': 'failed', 'data': "Type cannot be empty"})
         if(Type.lower() == "promoter"):
-            PartList = Parttable.objects.filter(type=1)
+            PartList = Parttable.objects.filter(type=PartType.PROMOTER)
         elif(Type.lower() == "terminator"):
-            PartList = Parttable.objects.filter(type=3)
+            PartList = Parttable.objects.filter(type=PartType.TERMINATOR)
         elif(Type.lower() == "cds"):
-            PartList = Parttable.objects.filter(type=2)
+            PartList = Parttable.objects.filter(type=PartType.CDS)
         elif(Type.lower() == "rbs"):
-            PartList = Parttable.objects.filter(type=4)
+            PartList = Parttable.objects.filter(type=PartType.RBS)
         else:
             PartList = Parttable.objects.filter(type=5)
         if(len(PartList) > 0):
@@ -682,17 +685,17 @@ def SearchPartTypeByName(request):
             # return JsonResponse({'code':204,'status': 'failed', 'data': "Name cannot be empty"})
         Type = Parttable.objects.filter(name=Name).first().type
         if(Type != None):
-            if(Type == 1):
+            if(Type == PartType.PROMOTER):
                 return JsonResponse(data={"Type":"Promoter"},status=200)
                 # return JsonResponse({'code':200,'status': 'success', 'data': {"Type":"Promoter"}})
-            elif(Type == 2):
+            elif(Type == PartType.CDS):
                 return JsonResponse(data={"Type":"CDS"},status=200)
                 # return JsonResponse({'code':200,'status':'success','data':{"Type":"Terminator"}})
-            elif(Type == 3):
+            elif(Type == PartType.TERMINATOR):
                 # return HttpResponse("CDS")
                 return JsonResponse(data={"Type":"Terminator"},status=200)
                 # return JsonResponse({'code':200,'status': 'success', 'data': {"Type": "CDS"}})
-            elif(Type == 4):
+            elif(Type == PartType.RBS):
                 return JsonResponse(data={"Type":"RBS"},status=200)
                 # return JsonResponse({'code':200,'status': 'success', 'data': {"Type": "RBS"}})
             else:
@@ -726,17 +729,17 @@ def SearchPartTypeByID(request):
             # return JsonResponse({'code':204,'status': 'failed', 'data': "Name cannot be empty"})
         Type = Parttable.objects.filter(partid=ID).first().type
         if(Type != None):
-            if(Type == 1):
+            if(Type == PartType.PROMOTER):
                 return JsonResponse(data={"Type":"Promoter"},status=200)
                 # return JsonResponse({'code':200,'status': 'success', 'data': {"Type":"Promoter"}})
-            elif(Type == 3):
+            elif(Type == PartType.TERMINATOR):
                 return JsonResponse(data={"Type":"Terminator"},status=200)
                 # return JsonResponse({'code':200,'status':'success','data':{"Type":"Terminator"}})
-            elif(Type == 2):
+            elif(Type == PartType.CDS):
                 # return HttpResponse("CDS")
                 return JsonResponse(data={"Type":"CDS"},status=200)
                 # return JsonResponse({'code':200,'status': 'success', 'data': {"Type": "CDS"}})
-            elif(Type == 4):
+            elif(Type == PartType.RBS):
                 return JsonResponse(data={"Type":"RBS"},status=200)
                 # return JsonResponse({'code':200,'status': 'success', 'data': {"Type": "RBS"}})
             else:
@@ -934,13 +937,13 @@ def AddPartData(request):
         if(type == None or type == ""):
             raise WebDatabaseValidationException(parameter = "type")
         if(type.lower() == "promoter"):
-            type = 1
+            type=PartType.PROMOTER
         elif(type.lower() == "terminator"):
-            type = 3
+            type=PartType.TERMINATOR
         elif(type.lower() == "cds"):
-            type = 2
+            type=PartType.CDS
         elif(type.lower() == "rbs"):
-            type = 4
+            type=PartType.RBS
         elif(type.lower() == "p+r"):
             type = 5
         username = request.session['info']['uname']
@@ -1327,7 +1330,7 @@ def PlasmidDataALL(request):
                 # return JsonResponse(data="No plasmid", status=404,safe=False)
                 # return JsonResponse({'code':204,'status': 'failed', 'data': []})
         else:
-            page_size = int(request.GET.get('page_size',10))
+            page_size = bounded_page_size(request.GET.get('page_size'))
             offset = (page -1)*page_size
             total_count = Plasmidneed.objects.count()
             total_pages = (total_count + page_size -1) // page_size
@@ -1376,7 +1379,7 @@ def PlasmidFilter(request):
         Enzyme = data['Enzyme']
         Scar = data['Scar']
         page = data['page']
-        page_size = data['page_size']
+        page_size = bounded_page_size(data.get('page_size'))
         offset = (page -1)*page_size
         scarplasmidid = []
         if(Enzyme == "BsmBI"):
@@ -2143,9 +2146,9 @@ def AddParentPlasmid(request):
             raise WebDatabaseValidationException(parameter = "ParentPlasmidName")
             # return JsonResponse(data="SonPlasmidName cannot be empty", status=400,safe=False)
             # return JsonResponse({'code':204,'status': 'failed', 'data': 'Plasmid Name can not be empty'})
-        start_time = time.time()
-        max_wait_time = 5
-        while time.time() - start_time < max_wait_time:
+        start_time = time.monotonic()
+        max_wait_time = settings.DB_RETRY_TIMEOUT_SECONDS
+        while time.monotonic() - start_time < max_wait_time:
             try:
                 with transaction.atomic():
                     sonPlasmidObj = Plasmidneed.objects.get(plasmidid = sonPlasmidid)
@@ -2156,11 +2159,11 @@ def AddParentPlasmid(request):
                         Parentplasmidtable.objects.create(sonplasmidid=sonPlasmidObj,parentplasmidid = parentPlasmidObj)
                     return JsonResponse(data={"success":True},status=200,safe=False)
             except Plasmidneed.DoesNotExist:
-                time.sleep(0.5)
+                time.sleep(settings.DB_RETRY_INTERVAL_SECONDS)
                 continue
             except OperationalError as e:
                 if 'lock' in str(e).lower():
-                    time.sleep(0.5)
+                    time.sleep(settings.DB_RETRY_INTERVAL_SECONDS)
                     continue
                 raise e
         raise WebDatabaseTimeoutException()
@@ -2187,9 +2190,9 @@ def AddPlasmidParentByID(request):
             raise WebDatabaseValidationException(parameter="ParentPlasmidID")
             # return JsonResponse(data="SonPlasmidName cannot be empty", status=400,safe=False)
             # return JsonResponse({'code':204,'status': 'failed', 'data': 'Plasmid Name can not be empty'})
-        start_time = time.time()
-        max_wait_time = 5
-        while time.time() - start_time < max_wait_time:
+        start_time = time.monotonic()
+        max_wait_time = settings.DB_RETRY_TIMEOUT_SECONDS
+        while time.monotonic() - start_time < max_wait_time:
             try:
                 with transaction.atomic():
                     sonPlasmidObj = Plasmidneed.objects.select_for_update().get(name = sonPlasmidName)
@@ -2200,11 +2203,11 @@ def AddPlasmidParentByID(request):
                         Parentplasmidtable.objects.create(sonplasmidid=sonPlasmidObj,parentplasmidid = parentPlasmidObj)
                     return JsonResponse(data={"success":True},status=200,safe=False)
             except Plasmidneed.DoesNotExist:
-                time.sleep(0.5)
+                time.sleep(settings.DB_RETRY_INTERVAL_SECONDS)
                 continue
             except OperationalError as e:
                 if 'lock' in str(e).lower():
-                    time.sleep(0.5)
+                    time.sleep(settings.DB_RETRY_INTERVAL_SECONDS)
                     continue
                 raise e
         raise WebDatabaseTimeoutException()
@@ -2361,7 +2364,7 @@ def GetUploadRecords(request):
         raise WebDatabaseException(message="table 只支持 parttable、backbonetable、plasmidneed")
     try:
         page = max(int(request.GET.get("page", 1)), 1)
-        page_size = min(max(int(request.GET.get("pagesize", 100)), 1), 5000)
+        page_size = bounded_page_size(request.GET.get("pagesize"), upload=True)
     except (TypeError, ValueError):
         raise WebDatabaseException(message="page 和 pagesize 必须为整数")
 
@@ -2615,9 +2618,9 @@ def setPlasmidCulture(request):
         Marker_list = data["marker"]
         if(plasmidName == None or plasmidName == ""):
             raise WebDatabaseValidationException(parameter = "name")
-        start_time = time.time()
-        max_wait_time = 5
-        while time.time() - start_time < max_wait_time:
+        start_time = time.monotonic()
+        max_wait_time = settings.DB_RETRY_TIMEOUT_SECONDS
+        while time.monotonic() - start_time < max_wait_time:
             try:
                 with transaction.atomic():
                     # plasmidid = Plasmidneed.objects.filter(name=plasmidName).first()
@@ -2635,11 +2638,11 @@ def setPlasmidCulture(request):
                     plasmidid.save()
                     return JsonResponse(data = {"success":True,"data":"success upload"},status=200, safe=False)
             except Plasmidneed.DoesNotExist:
-                time.sleep(0.5)
+                time.sleep(settings.DB_RETRY_INTERVAL_SECONDS)
                 continue
             except OperationalError as e:
                 if 'lock' in str(e).lower():
-                    time.sleep(0.5)
+                    time.sleep(settings.DB_RETRY_INTERVAL_SECONDS)
                     continue
                 raise e
         raise WebDatabaseTimeoutException()
@@ -2784,7 +2787,7 @@ def BackboneDataALL(request):
                 # return JsonResponse(data={'success':False, 'error':"No such backbone"}, status=404,safe=False)
                 # return JsonResponse({'code':204,'status': 'failed', 'data': []})
         else:
-            page_size = int(request.GET.get('page_size',10))
+            page_size = bounded_page_size(request.GET.get('page_size'))
             offset = (page -1)*page_size
             total_count = Backbonetable.objects.count()
             total_pages = (total_count + page_size -1) // page_size
@@ -2834,7 +2837,7 @@ def BackboneFilter(request):
         Scar = data['Scar']
         Name = data['name']
         page = data['page']
-        page_size = data['page_size']
+        page_size = bounded_page_size(data.get('page_size'))
         offset = (page -1)*page_size
         scarBackboneid = []
         if(Enzyme == "BsmBI"):
@@ -3563,9 +3566,9 @@ def setBackboneCulture(request):
             BackboneName = data["name"]
         Ori_list = data["ori"]
         Marker_list = data["marker"]
-        start_time = time.time()
-        max_wait_time = 5
-        while time.time() - start_time < max_wait_time:
+        start_time = time.monotonic()
+        max_wait_time = settings.DB_RETRY_TIMEOUT_SECONDS
+        while time.monotonic() - start_time < max_wait_time:
             try:
                 with transaction.atomic():
                     if("name" in data):
@@ -3584,11 +3587,11 @@ def setBackboneCulture(request):
                     backbone_obj.save()
                     return JsonResponse(data = {"success":True,"data":"success upload"},status=200, safe=False)
             except Plasmidneed.DoesNotExist:
-                time.sleep(0.5)
+                time.sleep(settings.DB_RETRY_INTERVAL_SECONDS)
                 continue
             except OperationalError as e:
                 if 'lock' in str(e).lower():
-                    time.sleep(0.5)
+                    time.sleep(settings.DB_RETRY_INTERVAL_SECONDS)
                     continue
                 raise e
         return JsonResponse(data={'success':False,'error':'time out'},status = 400, safe = False)
@@ -4631,19 +4634,19 @@ def AddPlasmidParentInfo(request):
         if(plasmidID == "" or plasmidID == 0):
             raise WebDatabaseValidationException(parameter = "plasmidID")
             # return JsonResponse(data = {"success":False,"data":"Parameter is empty"},status = 400, safe=False)
-        start_time = time.time()
-        max_wait_time = 5
-        while time.time() - start_time < max_wait_time:
+        start_time = time.monotonic()
+        max_wait_time = settings.DB_RETRY_TIMEOUT_SECONDS
+        while time.monotonic() - start_time < max_wait_time:
             try:
                 with transaction.atomic():
                     Plasmidneed.objects.filter(plasmidid = plasmidID).update(customparentinformation = ParentInfo)
                     return JsonResponse(data = {"success":True,"data":"success upload"},status=200, safe=False)
             except Plasmidneed.DoesNotExist:
-                time.sleep(0.5)
+                time.sleep(settings.DB_RETRY_INTERVAL_SECONDS)
                 continue
             except OperationalError as e:
                 if 'lock' in str(e).lower():
-                    time.sleep(0.5)
+                    time.sleep(settings.DB_RETRY_INTERVAL_SECONDS)
                     continue
                 raise e
         raise WebDatabaseTimeoutException()
@@ -4675,9 +4678,9 @@ def AddParentPart(request):
             
             # return JsonResponse(data="PlasmidName or PartName cannot be empty", status=400,safe=False)
             # return JsonResponse({'code':204,'status': 'failed', 'data': 'Plasmid Name can not be empty'})
-        start_time = time.time()
-        max_wait_time = 5
-        while time.time() - start_time < max_wait_time:
+        start_time = time.monotonic()
+        max_wait_time = settings.DB_RETRY_TIMEOUT_SECONDS
+        while time.monotonic() - start_time < max_wait_time:
             try:
                 with transaction.atomic():
                     sonPlasmidObj = Plasmidneed.objects.get(plasmidid = sonPlasmidid)
@@ -4689,14 +4692,14 @@ def AddParentPart(request):
                         Parentparttable.objects.create(sonplasmidid=sonPlasmidObj,parentpartid = parentPartObj)
                     return JsonResponse(data={"success":True},status=200,safe=False)
             except Plasmidneed.DoesNotExist:
-                time.sleep(0.5)
+                time.sleep(settings.DB_RETRY_INTERVAL_SECONDS)
                 continue
             except Parttable.DoesNotExist:
-                time.sleep(0.5)
+                time.sleep(settings.DB_RETRY_INTERVAL_SECONDS)
                 continue
             except OperationalError as e:
                 if 'lock' in str(e).lower():
-                    time.sleep(0.5)
+                    time.sleep(settings.DB_RETRY_INTERVAL_SECONDS)
                     continue
                 raise e
         raise WebDatabaseTimeoutException()
@@ -4721,9 +4724,9 @@ def AddParentPartByID(request):
             raise WebDatabaseValidationException(parameter="ParentPartID")
             # return JsonResponse(data="PlasmidName or PartName cannot be empty", status=400,safe=False)
             # return JsonResponse({'code':204,'status': 'failed', 'data': 'Plasmid Name can not be empty'})
-        start_time = time.time()
-        max_wait_time = 5
-        while time.time() - start_time < max_wait_time:
+        start_time = time.monotonic()
+        max_wait_time = settings.DB_RETRY_TIMEOUT_SECONDS
+        while time.monotonic() - start_time < max_wait_time:
             try:
                 with transaction.atomic():
                     sonPlasmidObj = Plasmidneed.objects.get(name = sonPlasmidName)
@@ -4735,14 +4738,14 @@ def AddParentPartByID(request):
                         Parentparttable.objects.create(sonplasmidid=sonPlasmidObj,parentpartid = parentPartObj)
                     return JsonResponse(data={"success":True},status=200,safe=False)
             except Plasmidneed.DoesNotExist:
-                time.sleep(0.5)
+                time.sleep(settings.DB_RETRY_INTERVAL_SECONDS)
                 continue
             except Parttable.DoesNotExist:
-                time.sleep(0.5)
+                time.sleep(settings.DB_RETRY_INTERVAL_SECONDS)
                 continue
             except OperationalError as e:
                 if 'lock' in str(e).lower():
-                    time.sleep(0.5)
+                    time.sleep(settings.DB_RETRY_INTERVAL_SECONDS)
                     continue
                 raise e
         raise WebDatabaseTimeoutException()
@@ -4769,9 +4772,9 @@ def AddParentBackbone(request):
             raise WebDatabaseValidationException()
             # return JsonResponse(data="PlasmidName or BackboneName cannot be empty", status=400,safe=False)
             # return JsonResponse({'code':204,'status': 'failed', 'data': 'Plasmid Name can not be empty'})
-        start_time = time.time()
-        max_wait_time = 5
-        while time.time() - start_time < max_wait_time:
+        start_time = time.monotonic()
+        max_wait_time = settings.DB_RETRY_TIMEOUT_SECONDS
+        while time.monotonic() - start_time < max_wait_time:
             try:
                 with transaction.atomic():
                     sonPlasmidObj = Plasmidneed.objects.get(plasmidid = sonPlasmidid)
@@ -4784,14 +4787,14 @@ def AddParentBackbone(request):
                         Parentbackbonetable.objects.create(sonplasmidid=sonPlasmidObj,parentbackboneid = parentBackboneObj)
                     return JsonResponse(data={"success":True},status=200,safe=False)
             except Plasmidneed.DoesNotExist:
-                time.sleep(0.5)
+                time.sleep(settings.DB_RETRY_INTERVAL_SECONDS)
                 continue
             except Backbonetable.DoesNotExist:
-                time.sleep(0.5)
+                time.sleep(settings.DB_RETRY_INTERVAL_SECONDS)
                 continue
             except OperationalError as e:
                 if 'lock' in str(e).lower():
-                    time.sleep(0.5)
+                    time.sleep(settings.DB_RETRY_INTERVAL_SECONDS)
                     continue
                 raise e
         raise WebDatabaseTimeoutException()
@@ -4818,9 +4821,9 @@ def AddBackboneParentByID(request):
             raise WebDatabaseValidationException(parameter="ParentBackboneID")
             # return JsonResponse(data="PlasmidName or BackboneName cannot be empty", status=400,safe=False)
             # return JsonResponse({'code':204,'status': 'failed', 'data': 'Plasmid Name can not be empty'})
-        start_time = time.time()
-        max_wait_time = 5
-        while time.time() - start_time < max_wait_time:
+        start_time = time.monotonic()
+        max_wait_time = settings.DB_RETRY_TIMEOUT_SECONDS
+        while time.monotonic() - start_time < max_wait_time:
             try:
                 with transaction.atomic():
                     sonPlasmidObj = Plasmidneed.objects.get(name = sonPlasmidName)
@@ -4832,14 +4835,14 @@ def AddBackboneParentByID(request):
                         Parentbackbonetable.objects.create(sonplasmidid=sonPlasmidObj,parentbackboneid = parentBackboneObj)
                     return JsonResponse(data={"success":True},status=200,safe=False)
             except Plasmidneed.DoesNotExist:
-                time.sleep(0.5)
+                time.sleep(settings.DB_RETRY_INTERVAL_SECONDS)
                 continue
             except Backbonetable.DoesNotExist:
-                time.sleep(0.5)
+                time.sleep(settings.DB_RETRY_INTERVAL_SECONDS)
                 continue
             except OperationalError as e:
                 if 'lock' in str(e).lower():
-                    time.sleep(0.5)
+                    time.sleep(settings.DB_RETRY_INTERVAL_SECONDS)
                     continue
                 raise e
         raise WebDatabaseTimeoutException()
@@ -5003,9 +5006,9 @@ def setPartScar(request):
         aari = data['aari']
         sapi = data['sapi']
         if(name != None and name != ""):
-            start_time = time.time()
-            max_wait_time = 5
-            while time.time() - start_time < max_wait_time:
+            start_time = time.monotonic()
+            max_wait_time = settings.DB_RETRY_TIMEOUT_SECONDS
+            while time.monotonic() - start_time < max_wait_time:
                 try:
                     with transaction.atomic():
                         # part_obj = Parttable.objects.filter(name = name).first()
@@ -5029,11 +5032,11 @@ def setPartScar(request):
                             # Partscartable.objects.create(partid = part_obj, bsmbi = bsmbi, bsai = bsai, bbsi = bbsi,aari = aari, sapi = sapi)
                             return JsonResponse(data = {'success':True}, status = 200, safe = False)
                 except Parttable.DoesNotExist:
-                    time.sleep(0.5)
+                    time.sleep(settings.DB_RETRY_INTERVAL_SECONDS)
                     continue
                 except OperationalError as e:
                     if 'lock' in str(e).lower():
-                        time.sleep(0.5)
+                        time.sleep(settings.DB_RETRY_INTERVAL_SECONDS)
                         continue
                     raise e
             raise WebDatabaseTimeoutException()
@@ -5099,9 +5102,9 @@ def setBackboneScar(request):
         aari = data['aari']
         sapi = data['sapi']
         if(("name" in data and name != None and name != "") or ("backboneid" in data and id != None and id != "")):
-            start_time = time.time()
-            max_wait_time = 5
-            while time.time() - start_time < max_wait_time:
+            start_time = time.monotonic()
+            max_wait_time = settings.DB_RETRY_TIMEOUT_SECONDS
+            while time.monotonic() - start_time < max_wait_time:
                 try:
                     with transaction.atomic():
                         # backbone_obj = Backbonetable.objects.filter(name = name).first()
@@ -5121,11 +5124,11 @@ def setBackboneScar(request):
                             # Backbonescartable.objects.filter(backboneid = backbone_obj).update(bsmbi = bsmbi, bsai = bsai, bbsi = bbsi,aari = aari, sapi = sapi)
                         return JsonResponse(data = {'success':True}, status = 200, safe = False)
                 except Backbonetable.DoesNotExist:
-                    time.sleep(0.5)
+                    time.sleep(settings.DB_RETRY_INTERVAL_SECONDS)
                     continue
                 except OperationalError as e:
                     if 'lock' in str(e).lower():
-                        time.sleep(0.5)
+                        time.sleep(settings.DB_RETRY_INTERVAL_SECONDS)
                         continue
                     raise e
             raise WebDatabaseTimeoutException()
@@ -5185,9 +5188,9 @@ def setPlasmidScar(request):
         aari = data['aari']
         sapi = data['sapi']
         if(("name" in data and name != None and name != "") or ("plasmidid" in data and id != None and id != "")):
-            start_time = time.time()
-            max_wait_time = 5
-            while time.time() - start_time < max_wait_time:
+            start_time = time.monotonic()
+            max_wait_time = settings.DB_RETRY_TIMEOUT_SECONDS
+            while time.monotonic() - start_time < max_wait_time:
                 try:
                     with transaction.atomic():
                         # plasmid_obj = Plasmidneed.objects.filter(name = name).first()
@@ -5209,11 +5212,11 @@ def setPlasmidScar(request):
                         plasmid_obj.save()
                     return JsonResponse(data = {'success':True}, status = 200, safe = False)
                 except Plasmidneed.DoesNotExist:
-                    time.sleep(0.5)
+                    time.sleep(settings.DB_RETRY_INTERVAL_SECONDS)
                     continue
                 except OperationalError as e:
                     if 'lock' in str(e).lower():
-                        time.sleep(0.5)
+                        time.sleep(settings.DB_RETRY_INTERVAL_SECONDS)
                         continue
                     raise e
             raise WebDatabaseTimeoutException()
@@ -5580,7 +5583,7 @@ def create_repository(request):
         if(Name != None and Name != ""):
             try:
                 repository_id = str(uuid.uuid1())
-                ttl_hours = 24*30
+                ttl_hours = settings.REPOSITORY_CREATE_TTL_HOURS
                 
                 expires_at = timezone.localtime(timezone.now())+timezone.timedelta(hours = ttl_hours)
                 user = request.user
@@ -5692,7 +5695,7 @@ def add_part_to_repository(request):
         except Temporaryrepository.DoesNotExist:
             # 鍒涘缓鏂扮殑涓存椂浠撳簱,璇㈤棶鍚嶇О
             repository_id = uuid.uuid4()
-            ttl_hours = 24
+            ttl_hours = settings.REPOSITORY_UPDATE_TTL_HOURS
             expires_at = timezone.localtime(timezone.now()) + timezone.timedelta(hours=ttl_hours)
             user = CustomUser.objects.filter(uid=user_id).first()
             
@@ -5809,7 +5812,7 @@ def add_backbone_to_repository(request):
         except Temporaryrepository.DoesNotExist:
             # 鍒涘缓鏂扮殑涓存椂浠撳簱,璇㈤棶鍚嶇О
             repository_id = uuid.uuid4()
-            ttl_hours = 24
+            ttl_hours = settings.REPOSITORY_UPDATE_TTL_HOURS
             expires_at = timezone.localtime(timezone.now()) + timezone.timedelta(hours=ttl_hours)
             user = CustomUser.objects.filter(uid=user_id).first()
             
@@ -5916,7 +5919,7 @@ def add_plasmid_to_repository(request):
         except Temporaryrepository.DoesNotExist:
             # 鍒涘缓鏂扮殑涓存椂浠撳簱,璇㈤棶鍚嶇О
             repository_id = uuid.uuid4()
-            ttl_hours = 24
+            ttl_hours = settings.REPOSITORY_UPDATE_TTL_HOURS
             expires_at = timezone.localtime(timezone.now()) + timezone.timedelta(hours=ttl_hours)
             user = CustomUser.objects.filter(uid=user_id).first()
             

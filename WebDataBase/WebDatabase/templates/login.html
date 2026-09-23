@@ -131,7 +131,7 @@
             <div id="login-form">
                 <h2>用户登录</h2>
                 <div id="login-message" class="message"></div>
-                <form id="loginForm" method="POST" action = '/WebDatabase/login?next={{next_url}}'>
+                <form id="loginForm" method="POST" action = '{% url 'api:login' %}?next={{next_url}}'>
                     {% csrf_token %}
                     <div class="form-group">
                         <label for="{{form.username.id_for_label}}">{{form.username.label}}</label>
@@ -152,13 +152,13 @@
                     <button type="submit">登录</button>
                 </form>
                 <div class="toggle-form">
-                    还没有账号？<a href="/WebDatabase/register" id="show-register">立即注册</a>
+                    还没有账号？<a href="{% url 'api:register' %}" id="show-register">立即注册</a>
                 </div>
                 <div class="toggle-form">
-                    忘记密码啦？<a href="/WebDatabase/reset" id="show-reset">立即重置</a>
+                    忘记密码啦？<a href="{% url 'api:resetpassword' %}" id="show-reset">立即重置</a>
                 </div>
                 <div class="toggle-form">
-                    你是管理员？<a href="/WebDatabase/AdminRegister" id="show-admin">管理员登录</a>
+                    你是管理员？<a href="{% url 'api:AdminRegister' %}" id="show-admin">管理员登录</a>
                 </div>
             </div>
             

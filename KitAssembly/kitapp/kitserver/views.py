@@ -2,6 +2,7 @@ from django.shortcuts import redirect, render
 from django.http import JsonResponse,HttpResponseRedirect,StreamingHttpResponse,FileResponse, Http404
 from django.views.decorators.csrf import ensure_csrf_cookie
 import requests
+from .http_client import ApiSession
 from django.conf import settings
 import json
 import uuid
@@ -117,7 +118,7 @@ def __create_session(request):
     if next_value:
         login_data["next"] = next_value
     
-    session = requests.Session()
+    session = ApiSession()
     response = session.get(login_url, data=login_data, timeout=_webdb_timeout())
     if(response.status_code == 200):
         token = request.COOKIES.get('csrftoken')
@@ -762,27 +763,29 @@ def gg_assemble(request):
     response["Content-Disposition"] = f'attachment; filename="{output_name}.gb"'
     return response
 
+def _configured_download(request, setting_name):
+    if request.method != 'GET':
+        return JsonResponse({'success': False, 'message': 'GET required'}, status=405)
+    file_address = getattr(settings, setting_name, None)
+    if not file_address or not os.path.isfile(file_address):
+        raise Http404('Download file is not configured or does not exist')
+    try:
+        stream = open(file_address, 'rb')
+    except FileNotFoundError:
+        raise Http404('Download file does not exist') from None
+    return FileResponse(stream, as_attachment=True)
+
+
 def getTutorial(request):
-    if(request.method == "GET"):
-        file_address = getattr(settings,"TUROERIAL_ADDRESS")
-        if(os.path.exists(file_address)):
-            response = FileResponse(open(file_address,'rb'), as_attachment=True)
-            return response
-        else:
-            return JsonResponse(data={"success":False},status=400,safe=False)
-        
-        
+    return _configured_download(request, 'TUTORIAL_ADDRESS')
+
+
 def getZip(request):
-    if(request.method == "GET"):
-        file_address = getattr(settings,"ZIP_ADDRESS")
-        if(os.path.exists(file_address)):
-            response = FileResponse(open(file_address,'rb'), as_attachment=True)
-            return response
-        else:
-            return JsonResponse(data={"success":False},status=400,safe=False)
+    return _configured_download(request, 'ZIP_ADDRESS')
+
 
 def getTutorialTest(request, doc_path=""):
-    site_root = os.path.join(settings.BASE_DIR, "site")
+    site_root = settings.TUTORIAL_SITE_ROOT
     requested = (doc_path or "").strip("/").replace("\\", "/")
 
     candidates = []
@@ -799,7 +802,10 @@ def getTutorialTest(request, doc_path=""):
     site_root_real = os.path.realpath(site_root)
     for candidate in candidates:
         candidate_real = os.path.realpath(candidate)
-        if not candidate_real.startswith(site_root_real):
+        try:
+            if os.path.commonpath([candidate_real, site_root_real]) != site_root_real:
+                continue
+        except ValueError:
             continue
         if os.path.isfile(candidate_real):
             resolved_path = candidate_real

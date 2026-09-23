@@ -1,20 +1,20 @@
+from WebDataWorld.runtime import ServiceSession, service_url
 import logging
 from django.shortcuts import render
 import requests
-from .. import views
 
 logger = logging.getLogger(__name__)
 
-Base_URL = views.Base_URL
 
 def is_superuser(user):
     return user.is_authenticated and user.is_staff
 
 
 def AdminDashbordView(request):
+    Base_URL = service_url('WEBDATABASE_API_BASE_URL')
     if(is_superuser(request.user)):
         #用户名统计
-        session = requests.Session()
+        session = ServiceSession()
         session.headers.update({
             'User-Agent':'Django-App/1.0',
             'Content-Type':'application/json',

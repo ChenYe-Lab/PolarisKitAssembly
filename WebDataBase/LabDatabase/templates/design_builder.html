@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -5,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token }}">
     <title>Design Builder</title>
-    <link href="/static/LabDatabase/bootstrap.min.css?v=20260509" rel="stylesheet" type="text/css">
+    <link href="{% static 'LabDatabase/bootstrap.min.css' %}?v=20260509" rel="stylesheet" type="text/css">
     <style>
         :root {
             --page-bg: #f5f6f8;
@@ -635,11 +636,11 @@
                     <div class="brand-subtitle">Device Generator</div>
                 </div>
                 <nav class="topbar-nav">
-                    <a href="/LabDatabase/index">Browse</a>
+                    <a href="{% url 'lab:index' %}">Browse</a>
                     <a href="#" class="active">Tools</a>
-                    <a href="/LabDatabase/index">Upload</a>
-                    <a href="/LabDatabase/index">Community</a>
-                    <a href="/LabDatabase/index">Help</a>
+                    <a href="{% url 'lab:index' %}">Upload</a>
+                    <a href="{% url 'lab:index' %}">Community</a>
+                    <a href="{% url 'lab:index' %}">Help</a>
                     <div class="avatar-chip">U</div>
                 </nav>
             </div>
@@ -651,8 +652,8 @@
                 <div>
                     <h3>Part Design</h3>
                     <ul class="nav-list">
-                        <li><a class="nav-link" href="/LabDatabase/index">T-Pro</a></li>
-                        <li><a class="nav-link" href="/LabDatabase/index">TF Plot</a></li>
+                        <li><a class="nav-link" href="{% url 'lab:index' %}">T-Pro</a></li>
+                        <li><a class="nav-link" href="{% url 'lab:index' %}">TF Plot</a></li>
                     </ul>
                 </div>
                 <div>
@@ -827,6 +828,6 @@
     {{ promoter_strength_presets|json_script:"promoter-strength-presets" }}
     {{ rbs_strength_presets|json_script:"rbs-strength-presets" }}
     {{ terminator_strength_presets|json_script:"terminator-strength-presets" }}
-    <script src="/static/LabDatabase/js/design_builder.js?"></script>
+    <script src="{% static 'LabDatabase/js/design_builder.js' %}?"></script>
 </body>
 </html>

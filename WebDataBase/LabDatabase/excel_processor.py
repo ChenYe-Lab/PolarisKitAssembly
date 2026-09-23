@@ -1,3 +1,4 @@
+from WebDataWorld.runtime import ServiceSession
 from django.core.exceptions import ValidationError
 import logging
 import requests
@@ -6,15 +7,14 @@ from .CaculateModule.ScarIdentify import scarFunction
 from django.db import transaction
 from django.db import DatabaseError
 import time
-from LabDatabaseException import LabDatabaseException
+from LabDatabase.LabDatabaseException import LabDatabaseException
 from Bio.Restriction import BsaI,BbsI
 from Bio.Seq import Seq
 
-# BASE_URL = 'http://10.30.76.2:8004/WebDatabase'
 logger = logging.getLogger(__name__)
 
 def createSession(django_request):
-    session = requests.Session()
+    session = ServiceSession()
     # token = django_request.COOKIES.get('csrftoken')
             # session.headers.update({
             #     'User-Agent':'Django-App/1.0',
@@ -148,7 +148,7 @@ class ExcelProcessor:
             error_rows = []
             empty_seq_rows = []
             session = createSession(django_request)
-            # session = requests.Session()
+            # session = ServiceSession()
             # token = django_request.COOKIES.get('csrftoken')
             # session.headers.update({
             #     'User-Agent':'Django-App/1.0',

@@ -1,9 +1,7 @@
 """Fresh, annotated assembly inputs using the Desktop feature-record workflow."""
 from pathlib import Path
-from uuid import uuid4
 
 from Bio.Seq import Seq
-from Bio.SeqFeature import SeqFeature, SimpleLocation
 
 from .feature_records import (record_from_rows, normalized_record, write_record,
                               first, digest, feature_rows)
@@ -31,23 +29,12 @@ def source_record(kind, ident):
 
 
 def attach_source(record, kind, obj):
-    """Keep internal annotations; plasmids additionally retain a whole-input label."""
+    """Annotate internal features without adding a whole-plasmid feature."""
     revision = digest({'sequence': str(record.seq).upper(), 'features': feature_rows(record)})
     for feature in record.features:
         feature.qualifiers.setdefault('source_type', [kind])
         feature.qualifiers.setdefault('source_id', [str(obj.pk)])
         feature.qualifiers.setdefault('source_revision', [revision])
-    # if kind == 'plasmid':
-    #     record.features.append(SeqFeature(SimpleLocation(0, len(record), strand=1),
-    #         type='misc_feature', qualifiers={
-    #             'label': [obj.name], 'source_type': ['plasmid'],
-    #             'source_id': [str(obj.pk)], 'source_level': [str(obj.level)],
-    #             'source_revision': [revision], 'source_container': ['true'],
-    #             'feature_group': [str(uuid4())],
-    #         }))
-        # record.features.append(f for f in record.features
-        #                            if first(f.qualifiers, 'source_container') != 'true'
-        #                            and first(f.qualifiers, 'indicates_part').lower() != 'true')
     if kind == 'backbone':
         # Only explicit container annotations are removed; real coextensive
         # biological features must survive.
