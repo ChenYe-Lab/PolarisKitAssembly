@@ -60,12 +60,26 @@ separate settings for normal and upload listings.
 
 ## Validation
 
-Run with an isolated SQLite database, never the production database:
+From `WebDataBase`, run the migration regression checks:
 
 ```text
-python manage.py test WebDatabase.tests LabDatabase.tests.test_runtime_configuration --settings=WebDataWorld.test_settings
-python -m unittest LabDatabase.tests.test_assembly_annotations -v
+python tests/test_migrations.py -v
 ```
 
-No database migration is required for these changes. Existing databases, `.env`,
-generated artifacts and unrelated working-tree changes must be preserved.
+These checks use an isolated in-memory SQLite database and do not load `.env`
+or deployment settings. They cover managed tables/columns, key foreign keys,
+model/migration consistency and preservation of data on repeated migrations.
+They do not verify MySQL upgrades or replace API and assembly regression tests.
+API, configuration, annotation and authentication regression sources are restored.
+Run `python manage.py test WebDatabase.tests LabDatabase.tests --settings=WebDataWorld.test_settings`.
+CI additionally uses `WebDataWorld.test_mysql_settings` with explicit `TEST_MYSQL_*`
+variables against a disposable MySQL instance, never a deployment database.
+
+API access now requires an active Django session. Legacy `session['info']` alone is
+not authentication. Business writes require editor/manager/admin (or superuser) and
+CSRF validation, including formerly exempt endpoints. Provision the frontend service
+account with `python manage.py create_kit_service_user kit-service`. The frontend
+obtains the backend's CSRF token, POSTs credentials and verifies the resulting session.
+
+For fresh databases and existing migration histories, see [MIGRATIONS.md](MIGRATIONS.md).
+Preserve existing databases, `.env`, generated artifacts and unrelated changes.

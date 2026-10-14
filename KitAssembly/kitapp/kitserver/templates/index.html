@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token }}">
     <title>KitAssembly Bio Lab Console</title>
+    <script src="{% static 'js/html.js' %}"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -1472,12 +1473,12 @@
                     : currentType.toUpperCase();
 
                 const rows = [];
-                rows.push(`<div class="meta-item"><b>${t('card.name')}:</b>${component.name}</div>`);
-                rows.push(`<div class="meta-item"><b>${t('card.length')}:</b>${normalizeText(component.length)}</div>`);
-                if (component.type) rows.push(`<div class="meta-item"><b>${t('card.type')}:</b>${component.type}</div>`);
-                if (component.part) rows.push(`<div class="meta-item"><b>${t('card.part')}:</b>${component.part}</div>`);
-                if (component.marker) rows.push(`<div class="meta-item"><b>${t('card.marker')}:</b>${normalizeText(component.marker)}</div>`);
-                if (component.ori) rows.push(`<div class="meta-item"><b>${t('card.ori')}:</b>${normalizeText(component.ori)}</div>`);
+                rows.push(`<div class="meta-item"><b>${t('card.name')}:</b>${escapeHtml(component.name)}</div>`);
+                rows.push(`<div class="meta-item"><b>${t('card.length')}:</b>${escapeHtml(normalizeText(component.length))}</div>`);
+                if (component.type) rows.push(`<div class="meta-item"><b>${t('card.type')}:</b>${escapeHtml(component.type)}</div>`);
+                if (component.part) rows.push(`<div class="meta-item"><b>${t('card.part')}:</b>${escapeHtml(component.part)}</div>`);
+                if (component.marker) rows.push(`<div class="meta-item"><b>${t('card.marker')}:</b>${escapeHtml(normalizeText(component.marker))}</div>`);
+                if (component.ori) rows.push(`<div class="meta-item"><b>${t('card.ori')}:</b>${escapeHtml(normalizeText(component.ori))}</div>`);
                 if (component.scar) {
                     const scarKeys = [
                         ["bbsi", t("card.scar_bbsi")],
@@ -1485,26 +1486,26 @@
                     ];
                     scarKeys.forEach(([key, label]) => {
                         if (component.scar[key] !== undefined && component.scar[key] !== null) {
-                            rows.push(`<div class="meta-item"><b>${label}:</b>${normalizeText(component.scar[key])}</div>`);
+                            rows.push(`<div class="meta-item"><b>${label}:</b>${escapeHtml(normalizeText(component.scar[key]))}</div>`);
                         }
                     });
                 }
-                if (component.user) rows.push(`<div class="meta-item"><b>${t('card.user')}:</b>${component.user}</div>`);
+                if (component.user) rows.push(`<div class="meta-item"><b>${t('card.user')}:</b>${escapeHtml(component.user)}</div>`);
 
                 const card = document.createElement('div');
                 card.className = `card ${isSelected ? 'selected' : ''}`;
                 card.innerHTML = `
                     <div class="card-head">
-                        <div class="card-name">${component.name}</div>
-                        <span class="badge">${tag}</span>
+                        <div class="card-name">${escapeHtml(component.name)}</div>
+                        <span class="badge">${escapeHtml(tag)}</span>
                     </div>
                     <div class="meta">${rows.join('')}</div>
                     <button
                         class="select-btn ${isSelected ? 'selected' : ''}"
-                        data-key="${key}"
-                        data-id="${component.name}"
-                        data-category="${currentCategory}"
-                        data-type="${currentType}">
+                        data-key="${escapeHtml(key)}"
+                        data-id="${escapeHtml(component.name)}"
+                        data-category="${escapeHtml(currentCategory)}"
+                        data-type="${escapeHtml(currentType)}">
                         ${isSelected ? `<i class="fa-solid fa-check"></i> ${t('select.selected')}` : `<i class="fa-solid fa-plus"></i> ${t('select.choose')}`}
                     </button>
                 `;
@@ -1550,10 +1551,10 @@
                 const li = document.createElement('li');
                 li.innerHTML = `
                     <div>
-                        <div class="selected-name">${component.name}</div>
-                        <div class="selected-sub">${component.category} | ${component.type}</div>
+                        <div class="selected-name">${escapeHtml(component.name)}</div>
+                        <div class="selected-sub">${escapeHtml(component.category)} | ${escapeHtml(component.type)}</div>
                     </div>
-                    <button class="remove-btn" data-key="${component.key}" title="${t('remove.title')}">
+                    <button class="remove-btn" data-key="${escapeHtml(component.key)}" title="${t('remove.title')}">
                         <i class="fa-solid fa-xmark"></i>
                     </button>
                 `;

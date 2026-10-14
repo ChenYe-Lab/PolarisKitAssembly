@@ -5,9 +5,7 @@ os.environ.setdefault('DJANGO_SECRET_KEY', 'isolated-test-key-not-for-deployment
 from .settings import *  # noqa: E402,F403
 
 DATABASES = {'default': {'ENGINE': 'django.db.backends.sqlite3', 'NAME': ':memory:'}}
-# Legacy migration 0003 removes a field absent from its migration state.
-# These API tests exercise the current models; migration tests run separately.
-MIGRATION_MODULES = {'WebDatabase': None, 'LabDatabase': None}
+# Use the checked-in migrations when creating the isolated test database.
 LOGGING = {}
 ALLOWED_HOSTS = ['testserver', 'localhost']
 SESSION_COOKIE_SECURE = False

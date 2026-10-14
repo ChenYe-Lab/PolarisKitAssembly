@@ -119,17 +119,36 @@ def __create_session(request):
         login_data["next"] = next_value
     
     session = ApiSession()
-    response = session.get(login_url, data=login_data, timeout=_webdb_timeout())
-    if(response.status_code == 200):
-        token = request.COOKIES.get('csrftoken')
-        session.headers.update({
-            'User-Agent':'Django-App/1.0',
-            'Content-Type':'application/json',
-            'X-CSRFToken':token,
-        })
+    try:
+        # A login page returning HTTP 200 is not evidence of authentication.
+        session.headers.update({'Accept': 'application/json'})
+        response = session.get(login_url, timeout=_webdb_timeout(), allow_redirects=False)
+        token = session.cookies.get('csrftoken')
+        if response.status_code != 200 or not token:
+            session.close()
+            return None
+        response = session.post(login_url, data=login_data,
+            headers={'X-CSRFToken': token, 'Referer': login_url},
+            timeout=_webdb_timeout(), allow_redirects=False)
+        payload = response.json()
+        if response.status_code != 200 or payload.get('success') is not True or payload.get('authenticated') is not True:
+            session.close()
+            return None
+        verification = session.get(login_url, timeout=_webdb_timeout(), allow_redirects=False)
+        if verification.status_code != 200 or verification.json().get('authenticated') is not True:
+            session.close()
+            return None
+        token = session.cookies.get('csrftoken')  # Django rotates it on login.
+        if not token:
+            session.close()
+            return None
+        session.headers.update({'User-Agent': 'Django-App/1.0',
+            'X-CSRFToken': token, 'Referer': login_url})
         return session
-    else:
+    except (requests.RequestException, ValueError, AttributeError):
+        session.close()
         return None
+
 
 def _extract_scar(payload):
     if not isinstance(payload, dict):

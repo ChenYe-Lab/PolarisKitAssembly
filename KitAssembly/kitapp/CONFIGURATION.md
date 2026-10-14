@@ -38,5 +38,7 @@
 不自动移动或覆盖已有数据库与下载文件。静态资源 URL 为根路径
 `/kitserver/static/`，避免页面路径不同导致相对地址错误。
 
-本次只调整配置及其使用位置，未改动套件清单、组装算法或服务登录协议。
+服务登录使用后端 CSRF 令牌提交 POST，并通过后续请求确认会话；HTTP 200 登录页不代表认证成功。
+后端服务账号需为 editor、manager、admin 或 superuser；建议使用 create_kit_service_user 创建无后台权限的 editor。
+运行回归测试：`python manage.py test kitserver --settings=kitapp.test_settings`。
 示例中的具体账号密码已移除；如果此前的示例凭据仍在使用，应在服务端更换。

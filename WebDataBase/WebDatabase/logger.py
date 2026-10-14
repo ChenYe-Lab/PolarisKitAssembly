@@ -31,7 +31,7 @@ class DjangoLogger:
                 'status_code': response.status_code,
                 'duration_ms': duration_ms,
                 'user_agent': request.META.get('HTTP_USER_AGENT', ''),
-                'query_params': dict(request.GET),
+                'query_params': self._sanitize_data(dict(request.GET)),
             }
             
             # 记录敏感信息时要小心
@@ -41,7 +41,7 @@ class DjangoLogger:
             self.logger.info(json.dumps(log_data))
             
         except Exception as e:
-            self.logger.error(f"记录请求日志失败: {e}")
+            self.logger.error('Request logging failed: %s', type(e).__name__)
     
     def business_log(self, action, user_id, details, result='success'):
         """记录业务日志"""
@@ -51,7 +51,7 @@ class DjangoLogger:
             'type': 'business',
             'action': action,
             'user_id': user_id,
-            'details': details,
+            'details': self._sanitize_data(details),
             'result': result,
         }
         
@@ -66,7 +66,7 @@ class DjangoLogger:
             'error_type': type(error).__name__,
             'error_message': str(error),
             'traceback': self._get_traceback(),
-            'extra': extra or {},
+            'extra': self._sanitize_data(extra or {}),
         }
         
         if request:
@@ -89,15 +89,14 @@ class DjangoLogger:
     
     def _sanitize_data(self, data):
         """清理敏感数据"""
-        sensitive_fields = ['password', 'token', 'secret', 'key', 'credit_card']
-        sanitized = data.copy()
-        
-        for field in sensitive_fields:
-            if field in sanitized:
-                sanitized[field] = '***REDACTED***'
-        
-        return sanitized
-    
+        sensitive = ('password', 'passwd', 'pwd', 'token', 'secret', 'authorization', 'cookie', 'api_key', 'apikey', 'credit_card')
+        if isinstance(data, dict):
+            return {key: '***REDACTED***' if any(part in str(key).lower() for part in sensitive)
+                    else self._sanitize_data(value) for key, value in data.items()}
+        if isinstance(data, (list, tuple)):
+            return [self._sanitize_data(item) for item in data]
+        return data
+
     def _get_traceback(self):
         """获取堆栈跟踪"""
         import traceback

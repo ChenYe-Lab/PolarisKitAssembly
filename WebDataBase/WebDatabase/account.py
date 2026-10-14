@@ -6,7 +6,8 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm,Passw
 from django.contrib.auth.views import LoginView,LogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import CreateView, UpdateView, FormView
-from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
+from django.utils.http import url_has_allowed_host_and_scheme
 # from anaconda_navigator.api.external_apps.exceptions import ValidationError
 from django.contrib import admin, messages
 from django.http import JsonResponse
@@ -67,8 +68,6 @@ class ResetPasswordForm(PasswordResetForm):
         uname = self.cleaned_data.get('uname')
         if(email != "" and uname != ""):
             # 检查邮箱是否存在
-            print(CustomUser.objects.filter(email=email, is_active=True).exists())
-            print(CustomUser.objects.filter(uname=uname, is_active =True).exists())
             if not CustomUser.objects.filter(email=email, is_active=True).exists() and not CustomUser.objects.filter(uname = uname, is_active=True).exists():
                 self.add_error("email","用户名或邮箱不存在")
                 self.add_error("uname","用户名或邮箱不存在")
@@ -91,10 +90,6 @@ class ResetPasswordForm(PasswordResetForm):
         """认证用户（支持邮箱或用户名登录）"""
         from django.contrib.auth import authenticate
         from .models import CustomUser
-        print("authenticated_user")
-        # 先尝试用用户名认证
-        print(username)
-        print(password)
         user = authenticate(username=username, password=md5(password))
         if user != None:
             self.cleaned_data['uid'] = user.uid
@@ -109,7 +104,6 @@ class ResetPasswordForm(PasswordResetForm):
             except CustomUser.DoesNotExist:
                 pass
         else:
-            print("用户不存在")
             self.add_error("username","用户不存在")
             return user
         
@@ -155,13 +149,10 @@ class UserRegisterForm(forms.Form):
         self.cleaned_data = super().clean()
         username = self.cleaned_data.get('uname')
         email = self.cleaned_data.get('email')
-        print(self.cleaned_data)
         if username and CustomUser.objects.filter(uname = username).exists():
-            print('该用户名已被注册')
             self.add_error('uname','该用户名已被注册')
             return False
         if(email and CustomUser.objects.filter(email = email).exists()):
-            print('该邮箱已被注册')
             self.add_error('email','该邮箱已被注册')
             return False
         password1 = self.cleaned_data.get('password1')
@@ -173,24 +164,19 @@ class UserRegisterForm(forms.Form):
         return self.cleaned_data
     
     def save(self):
-        print(self.cleaned_data)
         user = CustomUser.objects.create_user(
             uname = self.cleaned_data.get('uname'),
             email = self.cleaned_data.get('email'),
             password=md5(self.cleaned_data.get('password1'))
         )
-        print(md5(self.cleaned_data.get('password1')))
-        print(user)
         return user
     
     def save_superuser(self):
-        print(self.cleaned_data)
         user = CustomUser.objects.create_superuser(
             uname = self.cleaned_data.get('uname'),
             email = self.cleaned_data.get('email'),
             password=md5(self.cleaned_data.get('password1'))
         )
-        print(user)
         return user
     
     
@@ -198,10 +184,7 @@ class UserRegisterForm(forms.Form):
         """认证用户（支持邮箱或用户名登录）"""
         from django.contrib.auth import authenticate
         from .models import CustomUser
-        print("authenticated_user")
         # 先尝试用用户名认证
-        print(username)
-        print(password)
         user = authenticate(username=username, password=md5(password))
         if user != None:
             self.cleaned_data['uid'] = user.uid
@@ -216,7 +199,6 @@ class UserRegisterForm(forms.Form):
             except CustomUser.DoesNotExist:
                 pass
         else:
-            print("用户不存在")
             self.add_error("username","用户不存在")
             return user
 
@@ -254,7 +236,6 @@ class CustomLoginForm(AuthenticationForm):
     def clean(self):
         """表单验证"""
         # self.cleaned_data = super().clean()
-        print("self.clean")
         # 如果表单验证失败，直接返回
         if 'username' not in self.cleaned_data or 'password' not in self.cleaned_data:
             self.add_error('username',"请输入用户名")
@@ -295,10 +276,7 @@ class CustomLoginForm(AuthenticationForm):
         """认证用户（支持邮箱或用户名登录）"""
         from django.contrib.auth import authenticate
         from .models import CustomUser
-        print("authenticated_user")
         # 先尝试用用户名认证
-        print(username)
-        print(password)
         user = authenticate(username=username, password=md5(password))
         if user != None:
             self.cleaned_data['uid'] = user.uid
@@ -307,66 +285,46 @@ class CustomLoginForm(AuthenticationForm):
         if user is None and '@' in username:
             try:
                 user_obj = CustomUser.objects.get(email=username)
-                print(user_obj)
                 user = authenticate(username=user_obj.username, password=md5(password))
-                print(user)
                 self.cleaned_data['uid'] = user.uid
                 return user
             except CustomUser.DoesNotExist:
-                print("用户不存在")
                 self.add_error("username","用户不存在")
                 return user
             except Exception as e:
-                print("1111111")
-                print(e.args)
+                pass  # Do not log account credentials or form payloads.
         else:
-            print("用户不存在")
             self.add_error("username","用户不存在")
             return user
 # @csrf_protect
+@ensure_csrf_cookie
+@csrf_protect
 def login_view(request):
-    if request.user.is_authenticated:
-        next_url = request.GET.get("next",reverse_lazy("lab:index"))
-        print("next_url: "+next_url)
-        return redirect(next_url)
-    if request.method == 'POST':
-        next_url = request.GET.get("next",reverse_lazy("lab:index"))
-        print("next_url: "+next_url)
-        form = CustomLoginForm(request=request, data = request.POST)
-        # print(form.errors)
-        if(form.is_valid()):
-            # form.clean()
-            print(form.cleaned_data)
-            # user = form.authenticate_user()
-            # login(request, user)
-            login(request, form.cleaned_data['user'])
-            if('@' in form.cleaned_data["username"]):
-                user_obj = CustomUser.objects.get(email = form.cleaned_data["username"])
-            else:
-                user_obj = CustomUser.objects.get(uname = form.cleaned_data["username"])
-            if user_obj is not None:
-                uid = user_obj.uid
-                username = user_obj.uname
-                print(form.cleaned_data['user'])
-                request.session['info'] = {'uid':uid,'uname':username}
-                print(form.cleaned_data)
-                return redirect(next_url)
-            else:
-                form.add_error('username',"用户名或邮箱错误")
-                form.add_error('password',"密码错误")
-                return render(request, 'Login.html', {"form":form,"next_url":next_url})
-        else:
-            # print(form.cleaned_data)
-            form.add_error('username',"用户名或邮箱错误")
-            form.add_error('password',"密码错误")
-            return render(request, 'Login.html', {"form":form,"next_url":next_url})
-    else:
-        form = CustomLoginForm(request=request)
-        next_url = request.GET.get("next",reverse_lazy("lab:index"))
-        return render(request, 'Login.html', {"form":form,"next_url":next_url})
-    
-    
-        
+    api = 'application/json' in request.headers.get('Accept', '')
+    next_url = request.GET.get('next') or reverse_lazy('lab:index')
+    if not url_has_allowed_host_and_scheme(str(next_url), {request.get_host()}, require_https=request.is_secure()):
+        next_url = reverse_lazy('lab:index')
+    if request.method == 'GET':
+        if api:
+            return JsonResponse({'success': True, 'authenticated': request.user.is_authenticated})
+        if request.user.is_authenticated:
+            return redirect(next_url)
+        return render(request, 'Login.html', {'form': CustomLoginForm(request=request), 'next_url': next_url})
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'message': 'Method not allowed'}, status=405)
+    form = CustomLoginForm(request=request, data=request.POST)
+    if form.is_valid():
+        user = form.cleaned_data['user']
+        if user.is_active:
+            login(request, user)
+            request.session['info'] = {'uid': user.pk, 'uname': user.uname}
+            if api:
+                return JsonResponse({'success': True, 'authenticated': True})
+            return redirect(next_url)
+    if api:
+        return JsonResponse({'success': False, 'authenticated': False, 'message': 'Invalid credentials'}, status=401)
+    return render(request, 'Login.html', {'form': form, 'next_url': next_url})
+
 
 def register(request):
     """用户注册视图"""
@@ -392,13 +350,12 @@ def register(request):
             else:
                 return render (request, 'Register.html',{"form":form})
         else:
-            print("form is invalid")
+            pass  # Do not log account credentials or form payloads.
         
     form = UserRegisterForm()
     return render(request, 'Register.html', {'form': form})
 
 def logout(request):
-    print("7777777")
     from django.contrib.auth import logout
     if request.user.is_authenticated:
         logout(request)
@@ -408,10 +365,7 @@ def logout(request):
 
 def admin_register(request):
     """用户注册视图"""
-    print("111111111111111111111111111111")
-    print(request.method)
     if request.method == 'POST':
-        print("balabala")
         form = UserRegisterForm(request.POST)
         if form.is_valid():
             form.clean_data()
@@ -433,9 +387,8 @@ def admin_register(request):
             else:
                 return render (request, 'Register_admin.html',{"form":form})
         else:
-            print("form is invalid")
+            pass  # Do not log account credentials or form payloads.
     else:
-        print("77777777")
         form = UserRegisterForm()
         return render(request, 'Register_admin.html', {'form': form})
 
@@ -448,7 +401,6 @@ def reset_password(request):
         form = ResetPasswordForm(request.POST)
         if form.is_valid():
             clean_data = form.clean_email_username()
-            print(f"clean_data is {clean_data}")
             if(clean_data != False and "uname" in clean_data and "email" in clean_data and "password1" in clean_data and "password2" in clean_data):
                 with transaction.atomic():
                     the_user = CustomUser.objects.select_for_update().get(Q(email = clean_data.get("email")) | Q(uname = clean_data.get("uname")))

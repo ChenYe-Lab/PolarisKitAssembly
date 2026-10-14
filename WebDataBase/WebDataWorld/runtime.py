@@ -21,6 +21,12 @@ class ServiceSession(requests.Session):
     def request(self, method, url, **kwargs):
         if kwargs.get('timeout') is None:
             kwargs['timeout'] = settings.SERVICE_HTTP_TIMEOUT
+        if method.upper() not in {'GET', 'HEAD', 'OPTIONS'}:
+            cookies = kwargs.get('cookies') or self.cookies
+            token = cookies.get('csrftoken') if cookies else None
+            if token:
+                kwargs['headers'] = {**self.headers, **kwargs.get('headers', {}),
+                                     'X-CSRFToken': token, 'Referer': url}
         return super().request(method, url, **kwargs)
 
 

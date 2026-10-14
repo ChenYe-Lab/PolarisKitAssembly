@@ -130,31 +130,12 @@ def _build_upload_record_query(filter_expr):
 
 class User_auth(MiddlewareMixin):
     
-    def process_request(self,request):
+    def process_request(self, request):
         request.start_time = time.monotonic()
-        try:
-            #鎺掗櫎涓嶉渶瑕佺櫥褰曞氨鑳借闂殑椤甸潰
-            if request.path_info == reverse("api:login") or request.path_info == reverse("api:register") or request.path_info == reverse("api:AdminRegister") or request.path_info == reverse("api:resetpassword"):
-                return
-            info = request.session.get('info')
-            #temp
-            if(info['uname'] == "wang5042"):
-                request.session["info"]["uname"] = "optimus_wang"
-            user = request.user
-            if user:
-                return
-            else:
-                return redirect('api:login')
-            # if not info:
-            #     return redirect('api:login')
-            # else:
-            #     return
-        except Exception as e:
-            return
 
     def process_response(self,request,response):
         final_time = time.monotonic()
-        duration_time = time.monotonic() - request.start_time
+        duration_time = time.monotonic() - getattr(request, "start_time", time.monotonic())
         request_logger.request_log(
             request, response, duration_time
         )
@@ -163,9 +144,8 @@ class User_auth(MiddlewareMixin):
         if(isinstance(exception, WebDatabaseException)):
             return exception.to_response()
         elif(isinstance(exception, Exception)):
-            print('777')
-            print(str(exception))
-            return JsonResponse(data={"success":False, "message":str(exception)},status=400,safe=False)
+            logging.getLogger(__name__).error('Unhandled request error: %s', type(exception).__name__)
+            return JsonResponse({'success': False, 'message': 'Internal server error'}, status=500)
         return None
     # if not info:
     #     return JsonResponse({'status': 'Not logged in'})
@@ -5582,7 +5562,7 @@ def create_repository(request):
         Level = data.get("level")
         if(Name != None and Name != ""):
             try:
-                repository_id = str(uuid.uuid1())
+                repository_id = uuid.uuid4().hex
                 ttl_hours = settings.REPOSITORY_CREATE_TTL_HOURS
                 
                 expires_at = timezone.localtime(timezone.now())+timezone.timedelta(hours = ttl_hours)
@@ -5694,7 +5674,7 @@ def add_part_to_repository(request):
             repository = Temporaryrepository.objects.get(userid=user,name=repositoryName)
         except Temporaryrepository.DoesNotExist:
             # 鍒涘缓鏂扮殑涓存椂浠撳簱,璇㈤棶鍚嶇О
-            repository_id = uuid.uuid4()
+            repository_id = uuid.uuid4().hex
             ttl_hours = settings.REPOSITORY_UPDATE_TTL_HOURS
             expires_at = timezone.localtime(timezone.now()) + timezone.timedelta(hours=ttl_hours)
             user = CustomUser.objects.filter(uid=user_id).first()
@@ -5811,7 +5791,7 @@ def add_backbone_to_repository(request):
             repository = Temporaryrepository.objects.get(userid=user,name=repositoryName)
         except Temporaryrepository.DoesNotExist:
             # 鍒涘缓鏂扮殑涓存椂浠撳簱,璇㈤棶鍚嶇О
-            repository_id = uuid.uuid4()
+            repository_id = uuid.uuid4().hex
             ttl_hours = settings.REPOSITORY_UPDATE_TTL_HOURS
             expires_at = timezone.localtime(timezone.now()) + timezone.timedelta(hours=ttl_hours)
             user = CustomUser.objects.filter(uid=user_id).first()
@@ -5918,7 +5898,7 @@ def add_plasmid_to_repository(request):
             repository = Temporaryrepository.objects.get(userid=user,name=repositoryName)
         except Temporaryrepository.DoesNotExist:
             # 鍒涘缓鏂扮殑涓存椂浠撳簱,璇㈤棶鍚嶇О
-            repository_id = uuid.uuid4()
+            repository_id = uuid.uuid4().hex
             ttl_hours = settings.REPOSITORY_UPDATE_TTL_HOURS
             expires_at = timezone.localtime(timezone.now()) + timezone.timedelta(hours=ttl_hours)
             user = CustomUser.objects.filter(uid=user_id).first()

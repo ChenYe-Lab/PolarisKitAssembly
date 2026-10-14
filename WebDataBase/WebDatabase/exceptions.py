@@ -74,7 +74,7 @@ class WebDatabaseServerException(WebDatabaseException):
 class WebDatabasePOSTMethodException(WebDatabaseException):
     default_error_code = "request_error"
     default_message = "Just POST Method"
-    default_status_code = 500
+    default_status_code = 405
     
     def __init__(self):
         super().__init__(self.default_message,self.default_error_code,self.default_status_code)
@@ -82,7 +82,7 @@ class WebDatabasePOSTMethodException(WebDatabaseException):
 class WebDatabaseGETMethodException(WebDatabaseException):
     default_error_code = "request_error"
     default_message = "JUST GET Method"
-    default_status_code = 500
+    default_status_code = 405
     
     def __init__(self):
         super().__init__(self.default_message,self.default_error_code,self.default_status_code)

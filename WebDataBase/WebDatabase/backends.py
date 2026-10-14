@@ -18,8 +18,8 @@ class EmailOrUsernameModelBackend(ModelBackend):
             return None
         
         # 验证密码
-        if user.check_password(password):
-            print("check_password")
+        if user.check_password(password) and self.user_can_authenticate(user):
+            pass
             return user
         
         # 增加登录失败次数

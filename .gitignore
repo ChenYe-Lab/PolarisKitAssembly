@@ -1,0 +1,24 @@
+# Local credentials and virtual environments
+.env
+.env.*
+!.env.example
+.venv/
+venv/
+# Python/runtime artifacts (keep source tests and migrations)
+__pycache__/
+*.py[cod]
+*.pyc.*
+*.sqlite3
+*.sqlite3-*
+*.log
+logs/
+media/
+output/
+staticfiles/
+.pytest_cache/
+.coverage
+htmlcov/
+.idea/
+.vscode/
+# Generated assemblies; retain spreadsheet template sources
+WebDataBase/LabDatabase/static/LabDatabase/DownloadFile/GenerateFile/

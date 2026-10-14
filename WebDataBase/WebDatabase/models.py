@@ -590,7 +590,6 @@ class Temporaryrepository(models.Model):
         managed = True
         db_table = 'temporaryrepository'
     def is_expired(self):
-        print("is_expired")
         return timezone.now() > self.repositoryexpire_time
 
 
@@ -611,9 +610,6 @@ class Testdatatable(models.Model):
 class UserManager(BaseUserManager):
     def create_user(self,uname, email, password, **extra_fields):
         """创建普通用户"""
-        print(uname)
-        print(email)
-        print(password)
         extra_fields.setdefault('is_staff',True)
         extra_fields.setdefault('is_active',True)
         if not email or not uname:
@@ -621,7 +617,6 @@ class UserManager(BaseUserManager):
         email = self.normalize_email(email)
         user = self.model(email = email, uname = uname,username = uname, **extra_fields)
         user.set_password(password)
-        print(user)
         user.save(using = self._db)
         return user
     def create_superuser(self, uname, email, password = None, **extra_fields):

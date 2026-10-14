@@ -85,6 +85,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'WebDatabase.views.User_auth',
+    'WebDatabase.access.ApiAccessMiddleware',
 ]
 
 ROOT_URLCONF = 'WebDataWorld.urls'
